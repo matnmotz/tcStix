@@ -1,0 +1,58 @@
+<div class="bg-white shadow-lg rounded-2xl w-full max-w-md mx-auto my-16 p-8 border border-gray-100">
+  <!-- Titel -->
+  <div class="mb-6 text-center">
+    <h1 class="text-2xl font-semibold text-gray-800">TC Stix Login</h1>
+  </div>
+
+  <!-- E-Mail -->
+  <div class="flex flex-col mb-4">
+    <label for="email" class="mb-1 text-sm font-medium text-gray-700">E-Mail-Adresse</label>
+    <input
+      type="text"
+      id="email"
+      placeholder="max.mustermann@gmail.com"
+      class="border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+    >
+  </div>
+
+  <!-- Passwort -->
+  <div class="flex flex-col mb-2">
+    <label for="password" class="mb-1 text-sm font-medium text-gray-700">Passwort</label>
+    <input
+      type="password"
+      id="password"
+      placeholder="••••••••"
+      class="border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+    >
+  </div>
+
+  <!-- Checkbox: Passwort anzeigen -->
+  <div class="flex items-center mb-6">
+    <input type="checkbox" id="showPassword" class="h-4 w-4 text-cyan-600 focus:ring-cyan-500 border-gray-300 rounded">
+    <label for="showPassword" class="ml-2 text-sm text-gray-600 cursor-pointer select-none">
+      Passwort anzeigen
+    </label>
+  </div>
+
+
+
+  <!-- Button & Link -->
+  <div class="flex items-center justify-between">
+    <button
+      class="bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2.5 px-5 rounded-lg shadow-sm transition"
+    >
+      Anmelden
+    </button>
+    <a href="/" class="text-sm text-gray-500 hover:text-gray-700 transition">Abbrechen</a>
+  </div>
+  
+</div>
+
+<script>
+  const passwordInput = document.getElementById('password');
+  const showPasswordCheckbox = document.getElementById('showPassword');
+
+  showPasswordCheckbox.addEventListener('change', () => {
+    passwordInput.type = showPasswordCheckbox.checked ? 'text' : 'password';
+  });
+</script>

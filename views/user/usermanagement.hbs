@@ -1,0 +1,145 @@
+<div class="w-[93%] mx-auto my-3">
+    <div class="w-full">
+        <div class="w-max mx-auto my-5">
+            <h1 class="text-[23px]">Benutzerverwaltung</h1>
+        </div>
+        <!-- Search and add user-->
+        <div class="md:grid md:grid-cols-[70%_30%] gap-4 my-3">
+            <div class="border rounded-xl flex justify-between bg-gray-100">
+                <input type="text" placeholder="Max Mustermann" id="search" class="h-[45px] px-3 w-full focus:outline-none"/>
+                <div class="h-[45px] flex items-center mr-4">
+                    <img src="/media/svg/magnifying_glass.svg" class="h-[30px]"/>
+                </div>
+            </div>
+            <div class="mt-3 md:mt-0">
+                <a href="/user/usermanagement/add" class="w-full flex justify-center items-center h-[45px] bg-gray-900 text-white rounded-xl">Benutzer hinzufügen</a>
+            </div>
+        </div>
+        <!-- Users -->
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="text-start py-2">Name</th>
+                    <th class="text-start py-2 hidden md:table-cell">Email</th>
+                    <th class="text-start py-2 hidden lg:table-cell">Rolle</th>
+                    <th class="py-2">Edit</th>
+                    <th class="py-2">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each user}}
+                <tr>
+                    <td>{{this.firstname}} {{this.lastname}}</td>
+                    <td class="hidden md:table-cell">{{this.email}}</td>
+                    <td class="hidden lg:table-cell">{{translateRole this.role}}</td>
+                    <td class="px-2"><img src="/media/svg/pencil.svg" class="h-[45px] w-full text-white bg-gray-900 px-2 py-2 rounded-xl mx-auto" onclick = "window.location.href='/user/usermanagement/edit/{{this.userID}}'"/></td>
+                    <td class="px-2 py-1"><img src="/media/svg/trash.svg" class="h-[45px] w-full bg-gray-900 text-white px-2 py-2 rounded-xl mx-auto" onclick = "window.location.href='/user/usermanagement/delete/{{this.userID}}'"/></td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    elSearch();
+    function elSearch(){
+        const search = document.getElementById('search');
+        search.addEventListener('input', (event) => {
+            showSearchResults(event);
+        })
+    }
+
+    function showSearchResults(event){
+        clearTbody();
+        const user = {{{json user}}};
+        if(event.target.value.trim() != ""){
+            appendUsers(handleInput(event.target.value));
+        }else{
+            appendUsers(user);
+        }
+    }
+
+    function translateRole(title){
+        const roleMap = new Map([
+            ["groundskeeper","Platzwart"],
+            ["president", "Obmann"],
+            ["treasurer","Kassier"],
+            ["secretary","Schriftführer"],
+            ["member","Mitglied"]
+        ]);
+        return roleMap.get(title) || title;
+    }
+
+    function clearTbody(){
+        const tbody = document.querySelector('tbody');
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+    }
+    
+    function handleInput(text){
+        const user = {{{json user}}};
+        let result = []; 
+        for(let i = 0; i < user.length; i++){
+            let split = text.split(' ');
+            if(split.length > 1){
+                //Vor- und Nachname
+                if((split[0].toLowerCase() == user[i].firstname.toLowerCase() && user[i].lastname.toLowerCase().startsWith(split[1].toLowerCase())) || (split[0].toLowerCase() == user[i].lastname.toLowerCase() && user[i].firstname.toLowerCase().startsWith(split[1].toLowerCase()))){
+                    result.push(user[i]);
+                }
+            }else{
+                //Vor- oder Nachname
+                if(user[i].firstname.toLowerCase().startsWith(split[0].toLowerCase().trim()) || user[i].lastname.toLowerCase().startsWith(split[0].toLowerCase().trim())){
+                    result.push(user[i]);
+                }
+            }
+        }
+        return result;
+    }
+
+    function appendUsers(user){
+        const tbody = document.querySelector('tbody');
+        for(let i = 0; i < user.length; i++){
+            let tr = document.createElement('tr');
+
+            let td = document.createElement('td');
+            td.innerText = user[i].firstname + " " + user[i].lastname;
+            tr.appendChild(td);
+
+            td = document.createElement('td');
+            td.innerText = user[i].email;
+            td.classList.add(...'hidden md:table-cell'.split(' '));
+            tr.appendChild(td);
+
+            td = document.createElement('td');
+            td.innerText = translateRole(user[i].role);
+            td.classList.add(...'hidden lg:table-cell'.split(' '));
+            tr.appendChild(td);
+
+            td = document.createElement('td');
+            td.classList.add('px-2');
+            let img = document.createElement('img');
+            img.src = "/media/svg/pencil.svg"
+            img.classList.add(...'h-[45px] w-full bg-gray-900 text-white px-2 py-2 rounded-xl mx-auto'.split(' '));
+            img.onclick = () => {
+                window.location.href = "/user/usermanagement/edit/"+ user[i].userID;
+            }
+            td.appendChild(img);
+            tr.appendChild(td);
+
+            td = document.createElement('td');
+            td.classList.add(...'px-2 py-1'.split(' '));
+            img = document.createElement('img');
+            img.src = "/media/svg/trash.svg"
+            img.classList.add(...'h-[45px] w-full bg-gray-900 text-white px-2 py-2 rounded-xl mx-auto'.split(' '));
+            img.onclick = () => {
+                window.location.href = "/user/usermanagement/delete/" + user[i].userID;
+            }
+            td.appendChild(img);
+            tr.appendChild(td);
+
+            tbody.appendChild(tr);
+            }
+    }
+</script>

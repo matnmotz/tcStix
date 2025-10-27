@@ -1,0 +1,67 @@
+{{> courtTable }}
+
+<div class="w-full px-4 md:px-8 lg:px-16 py-8 space-y-6" id="newsContainer">
+  <!-- Card 1 -->
+  <div class="bg-white shadow-lg rounded-2xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6 hover:shadow-2xl transition">
+    <div class="flex-shrink-0">
+      <img src="/media/svg/logo_black.svg" class="w-32 h-32 md:w-40 md:h-40 object-contain" alt="Logo">
+    </div>
+    <div class="flex-1">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-2">Instandsetzung des Tennisplatzes</h2>
+      <p class="text-gray-600">Am 23.04.2025 wurden die Plätze für die Sommersaison instand gesetzt.</p>
+    </div>
+  </div>
+
+  <!-- Card 2 -->
+  <div class="bg-white shadow-lg rounded-2xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6 hover:shadow-2xl transition">
+    <div class="flex-shrink-0">
+      <img src="/media/svg/logo_black.svg" class="w-32 h-32 md:w-40 md:h-40 object-contain" alt="Logo">
+    </div>
+    <div class="flex-1">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-2">Neuer Trainer im Team</h2>
+      <p class="text-gray-600">Ab dem 01.05.2025 begrüßen wir unseren neuen Trainer für das Jugendtraining.</p>
+    </div>
+  </div>
+
+  <!-- Card 3 (versteckt) -->
+  <div class="extra-card hidden bg-white shadow-lg rounded-2xl p-6 flex flex-col md:flex-row items-center md:items-start gap-6 hover:shadow-2xl transition-all duration-500 ease-in-out">
+    <div class="flex-shrink-0">
+      <img src="/media/svg/logo_black.svg" class="w-32 h-32 md:w-40 md:h-40 object-contain" alt="Logo">
+    </div>
+    <div class="flex-1">
+      <h2 class="text-2xl font-semibold text-gray-800 mb-2">Sommersaison-Eröffnung</h2>
+      <p class="text-gray-600">Die Sommersaison beginnt offiziell am 01.05.2025 mit einem kleinen Turnier für alle Mitglieder.</p>
+    </div>
+  </div>
+
+  <!-- Mehr anzeigen Button -->
+  <div class="text-center">
+    <button id="toggleBtn" class="bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2.5 px-6 rounded-lg shadow-sm transition">
+      Mehr anzeigen
+    </button>
+  </div>
+</div>
+
+
+<script>
+  const toggleBtn = document.getElementById('toggleBtn');
+  const extraCards = document.querySelectorAll('.extra-card');
+  let expanded = false;
+
+  toggleBtn.addEventListener('click', () => {
+    expanded = !expanded;
+
+    extraCards.forEach(card => {
+      if (expanded) {
+        card.classList.remove('hidden');
+        // Optional: sanft einblenden
+        card.classList.add('opacity-0');
+        setTimeout(() => card.classList.remove('opacity-0'), 10);
+      } else {
+        card.classList.add('hidden');
+      }
+    });
+
+    toggleBtn.textContent = expanded ? 'Weniger anzeigen' : 'Mehr anzeigen';
+  });
+</script>

@@ -1,0 +1,10 @@
+<footer class="bg-gray-900 text-white h-[50px]">
+    <div class="flex justify-center items-center h-full">
+        <span>&copy;<span id="year"></span> TC Stixneusiedl/Gallbrunn | <a href="/legal/imprint" class="hover:text-cyan-200">Impressum</a> | <a href="/legal/privacy" class="hover:text-cyan-200">Datenschutz</a></span>
+    </div>
+</footer>
+<script>
+    const year = document.getElementById('year');
+    let date = new Date().getFullYear();
+    year.innerHTML = date;
+</script>

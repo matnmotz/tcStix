@@ -1,0 +1,416 @@
+<div class="w-full max-w-[93%] mx-auto overflow-x-auto py-5">
+  <!-- AUSWAHLEN -->
+  <div class="w-max flex mx-auto lg:ml-auto lg:mr-0 py-3">
+    <!-- KW auswählen -->
+    <div class="w-max text-white px-3" id="choose-kw-drp">
+      <div id="kw-button" class="bg-gray-900 flex items-center px-5 py-3">
+        <span id="kw-button-text"></span>
+        <img src="/media/svg/arrowhead_down.svg" class="h-[30px]" />
+      </div>
+      <div id="kw-choose" class="bg-gray-900 border-t border-white px-5 py-3 hidden">
+      </div>
+    </div>
+    <!-- Ansicht auswählen -->
+    <div class="w-max text-white pl-3">
+      <div id="view-button" class="bg-gray-900 flex items-center px-5 py-3">
+        <span id="view-button-text"></span>
+        <img src="/media/svg/arrowhead_down.svg" class="h-[30px]" />
+      </div>
+      <div id="view-choose" class="bg-gray-900 border-t border-white px-5 py-3 hidden">
+      </div>
+    </div>
+  </div>
+
+  <!-- WEEK VIEW -->
+  <table class="w-full border-collapse border border-gray-300 text-center text-sm overflow-x-auto" id="weekTable">
+    <thead>
+      <!-- Zeile 1: Wochentage -->
+      <tr class="bg-gray-100">
+        <th rowspan="3" class="border border-gray-300 p-2 w-20">Zeit</th>
+        <th colspan="2" class="border border-gray-300 p-2">
+          <span class="hidden xl:inline">Montag</span>
+          <span class="inline xl:hidden">Mo</span>
+        </th>
+        <th colspan="2" class="border border-gray-300 p-2">
+          <span class="hidden xl:inline">Dienstag</span>
+          <span class="inline xl:hidden">Di</span>
+        </th>
+        <th colspan="2" class="border border-gray-300 p-2">
+          <span class="hidden xl:inline">Mittwoch</span>
+          <span class="inline xl:hidden">Mi</span>
+        </th>
+        <th colspan="2" class="border border-gray-300 p-2">
+          <span class="hidden xl:inline">Donnerstag</span>
+          <span class="inline xl:hidden">Do</span>
+        </th>
+        <th colspan="2" class="border border-gray-300 p-2">
+          <span class="hidden xl:inline">Freitag</span>
+          <span class="inline xl:hidden">Fr</span>
+        </th>
+        <th colspan="2" class="border border-gray-300 p-2">
+          <span class="hidden xl:inline">Samstag</span>
+          <span class="inline xl:hidden">Sa</span>
+        </th>
+        <th colspan="2" class="border border-gray-300 p-2">
+          <span class="hidden xl:inline">Sonntag</span>
+          <span class="inline xl:hidden">So</span>
+        </th>
+      </tr>
+
+      <!-- Zeile 2: Datum -->
+      <tr class="bg-gray-100 dates-row">
+        <th colspan="2" class="border border-gray-300 p-2"></th>
+        <th colspan="2" class="border border-gray-300 p-2"></th>
+        <th colspan="2" class="border border-gray-300 p-2"></th>
+        <th colspan="2" class="border border-gray-300 p-2"></th>
+        <th colspan="2" class="border border-gray-300 p-2"></th>
+        <th colspan="2" class="border border-gray-300 p-2"></th>
+        <th colspan="2" class="border border-gray-300 p-2"></th>
+      </tr>
+
+      <!-- Zeile 3: Platz 1 / Platz 2 -->
+      <tr class="bg-gray-100">
+        <th class="border border-gray-300 p-2">Platz 1</th>
+        <th class="border border-gray-300 p-2">Platz 2</th>
+        <th class="border border-gray-300 p-2">Platz 1</th>
+        <th class="border border-gray-300 p-2">Platz 2</th>
+        <th class="border border-gray-300 p-2">Platz 1</th>
+        <th class="border border-gray-300 p-2">Platz 2</th>
+        <th class="border border-gray-300 p-2">Platz 1</th>
+        <th class="border border-gray-300 p-2">Platz 2</th>
+        <th class="border border-gray-300 p-2">Platz 1</th>
+        <th class="border border-gray-300 p-2">Platz 2</th>
+        <th class="border border-gray-300 p-2">Platz 1</th>
+        <th class="border border-gray-300 p-2">Platz 2</th>
+        <th class="border border-gray-300 p-2">Platz 1</th>
+        <th class="border border-gray-300 p-2">Platz 2</th>
+      </tr>
+    </thead>
+
+    <tbody id="timeTableBody"></tbody>
+  </table>
+  <!-- DAY VIEW -->
+  <div id="dayTable" class="hidden">
+    <table class="w-full border-collapse border border-gray-300 text-center text-sm w-max mx-auto">
+      <thead>
+        <tr class="bg-gray-100">
+          <th rowspan="3" class="border border-gray-300 p-2 w-20">Zeit</th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span id="dayView-weekday">Montag</span>
+          </th>
+        </tr>
+
+        <tr class="bg-gray-100 dates-row">
+          <th colspan="2" id="dayView-date" class="border border-gray-300 p-2"><input type="date" id="dateInput"/></th>
+        </tr>
+
+        <tr class="bg-gray-100">
+          <th class="border border-gray-300 p-2 px-5">Platz 1</th>
+          <th class="border border-gray-300 p-2 px-5">Platz 2</th>
+        </tr>
+      </thead>
+
+      <tbody id="dayTimeTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  fillKWToDropdown();
+  fillViewDropdown();
+  createWeekTable();
+  createDayTable();
+  // SET right table for VP
+  const mediaQuery = window.matchMedia("(max-width: 1024px)");
+
+  function handleViewportChange(e) {
+    const kwDrp = document.getElementById('choose-kw-drp');
+    if (e.matches) {
+      dayView();
+      kwDrp.classList.remove('show');
+      kwDrp.classList.add('hidden');
+    } else {
+      weekView();
+      kwDrp.classList.remove('hidden');
+      kwDrp.classList.add('show');
+    }
+  }
+  handleViewportChange(mediaQuery);
+  // Auf Änderungen reagieren
+  mediaQuery.addEventListener("change", handleViewportChange);
+
+  function getMondayOfWeek(week, year = new Date().getFullYear()) {
+    const jan4 = new Date(year, 0, 4);
+    const dayOfWeek = jan4.getDay() || 7;
+    const firstMonday = new Date(jan4);
+    firstMonday.setDate(jan4.getDate() - dayOfWeek + 1);
+
+    const monday = new Date(firstMonday);
+    monday.setDate(firstMonday.getDate() + (week - 1) * 7);
+
+    return monday;
+  }
+  // WEEK TABLE
+  function createWeekTable(){
+    const heute = new Date();
+    const day = heute.getDay(); // Sonntag=0
+    const diff = day === 0 ? -6 : 1 - day; // Montag der aktuellen Woche
+    const ersterTag = (getMondayOfWeek(getKW()));
+
+    const dateCells = document.querySelectorAll(".dates-row th");
+    for (let i = 0; i < 7; i++) {
+      const tag = new Date(ersterTag);
+      tag.setDate(ersterTag.getDate() + i);
+      const datum = tag.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+
+      // Jede Zelle hat colspan=2 → beide Spalten denselben Wert setzen
+      dateCells[i].textContent = datum;
+      const nextCell = dateCells[i].nextElementSibling;
+      if (nextCell) nextCell.textContent = datum;
+    }
+
+    // --- Zeitspalten generieren (06–22 Uhr, je 2 Zeilen pro Stunde) ---
+    const tbody = document.getElementById("timeTableBody");
+
+    for (let stunde = 7; stunde <= 22; stunde++) {
+      // Erste Zeile der Stunde
+      const tr1 = document.createElement("tr");
+      const tr2 = document.createElement("tr");
+
+      // Zeit-Zelle links mit rowspan=2
+      let zeitCell = document.createElement("td");
+      zeitCell.rowSpan = "2";
+      zeitCell.className = "border-r border-l border-t border-gray-300 p-2 font-medium bg-gray-50";
+      zeitCell.textContent = `${String(stunde-1).padStart(2, "0")}:00`;
+      tr1.appendChild(zeitCell);
+
+      // 14 Platz-Zellen für Platz 1 & 2 für 7 Tage
+      for (let i = 0; i < 14; i++) {
+        let td = document.createElement("td");
+        td.className = "border border-gray-300 p-2 h-6";
+        tr1.appendChild(td);
+        td = document.createElement("td");
+        td.className = "border border-gray-300 p-2 h-6";
+        tr2.appendChild(td);
+      }
+      tbody.appendChild(tr1);
+      tbody.appendChild(tr2);
+    }
+  }
+
+  function changeDatesAtWeekTable(week){
+    const ersterTag = getMondayOfWeek(week);
+    const dateCells = document.querySelectorAll(".dates-row th");
+    for (let i = 0; i < 7; i++) {
+      const tag = new Date(ersterTag);
+      tag.setDate(ersterTag.getDate() + i);
+      const datum = tag.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" });
+
+      // Jede Zelle hat colspan=2 → beide Spalten denselben Wert setzen
+      dateCells[i].textContent = datum;
+      const nextCell = dateCells[i].nextElementSibling;
+      if (nextCell) nextCell.textContent = datum;
+    }
+  }
+  
+  function showBookingsAtWeekTable(week){
+    
+  }
+  // DAY TABLE
+  function createDayTable(){
+    setTodaysValues()
+    setMinAndMaxForDateInput();
+    setDateAndWeekdayFromInput();
+    createRows();
+  }
+  
+  function setMinAndMaxForDateInput(){
+    const input = document.getElementById('dateInput');
+    const today = new Date();
+
+    const dayOfWeek = today.getDay();
+    const diffToMonday = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek;
+    const mondayThisWeek = new Date(today);
+    mondayThisWeek.setDate(today.getDate() + diffToMonday);
+
+    const endDate = new Date(mondayThisWeek);
+    endDate.setDate(mondayThisWeek.getDate() + 20);
+
+    const formatDate = (date) => date.toISOString().split('T')[0];
+
+    input.min = formatDate(mondayThisWeek);
+    input.max = formatDate(endDate);
+  }
+  
+  function setDateAndWeekdayFromInput(){
+    const weekdays = ["Sonntag","Montag", "Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+    const input = document.getElementById('dateInput');
+    input.addEventListener('change', (event) => {
+      const date = new Date(input.value);
+      document.getElementById('dayView-weekday').innerText = weekdays[date.getDay()];
+    })
+  }
+  
+  function setTodaysValues(){
+    const weekdays = ["Sonntag","Montag", "Dienstag","Mittwoch","Donnerstag","Freitag","Samstag"];
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = String(today.getDate()).padStart(2, '0');
+    const formatted = `${y}-${m}-${d}`;
+    document.getElementById('dateInput').value = formatted;
+    document.getElementById('dayView-weekday').innerText = weekdays[today.getDay()];
+  }
+
+  function createRows(){
+    const tbody = document.getElementById('dayTimeTableBody');
+    for (let stunde = 7; stunde <= 22; stunde++) {
+      // Erste Zeile der Stunde
+      const tr1 = document.createElement("tr");
+
+      // Zeit-Zelle links mit rowspan=2
+      let zeitCell = document.createElement("td");
+      zeitCell.className = "border-r border-l border-t border-gray-300 p-2 font-medium bg-gray-50";
+      zeitCell.textContent = `${String(stunde-1).padStart(2, "0")}:00`;
+      zeitCell.rowSpan = 2;
+      tr1.appendChild(zeitCell);
+
+      // 14 Platz-Zellen für Platz 1 & 2 für 7 Tage
+      const tr2 = document.createElement('tr');
+      for (let i = 0; i < 2; i++) {
+        let td = document.createElement("td");
+        td.className = "border border-gray-300 p-2 h-6";
+        tr1.appendChild(td);
+        td = document.createElement("td");
+        td.className = "border border-gray-300 p-2 h-6";
+        tr2.appendChild(td);
+      }
+      tbody.appendChild(tr1);
+      tbody.appendChild(tr2);
+    }
+  }
+
+  //DROPDOWN VIEW
+  function fillViewDropdown(){
+    const views = ["Wochenansicht","Tagesansicht"];
+    const cont = document.getElementById('view-choose');
+    const isBelowLg = window.matchMedia('(max-width: 1023px)').matches;
+    const btnTxt = document.getElementById('view-button-text');
+    btnTxt.innerText = views[0];
+    for(let i = 0; i < views.length; i++){
+      let elem = document.createElement('div');
+      elem.innerText = views[i];
+      elem.className = 'cursor-pointer';
+      cont.appendChild(elem);
+    }
+    elViewBtn();
+    elViewChoose();
+  }
+ 
+  function dayView(){
+    const btnText = document.getElementById('view-button-text');
+    btnText.innerText = "Tagesansicht";
+    //Tagesansicht show & Wochenansicht hidden
+    document.getElementById('dayTable').classList.remove('hidden');
+    document.getElementById('dayTable').classList.add('show');
+    document.getElementById('weekTable').classList.remove('show');
+    document.getElementById('weekTable').classList.add('hidden');
+  }
+ 
+  function weekView(){
+    const btnText = document.getElementById('view-button-text');
+    btnText.innerText = "Wochenansicht";
+    //Tagesansicht hidden & Wochenansicht show
+    document.getElementById('dayTable').classList.remove('show');
+    document.getElementById('dayTable').classList.add('hidden');
+    document.getElementById('weekTable').classList.remove('hidden');
+    document.getElementById('weekTable').classList.add('show');
+  }
+  
+  function elViewBtn(){
+    const btn = document.getElementById('view-button');
+    const dropdown = document.getElementById('view-choose');
+    btn.addEventListener('click', (event) => {
+      if(dropdown.classList.contains('hidden')){
+        dropdown.classList.remove('hidden');
+        dropdown.classList.add('show');
+      }else{
+        dropdown.classList.remove('show');
+        dropdown.classList.add('hidden');
+      }
+    });
+  }
+  
+  function elViewChoose(){
+    const childs = document.getElementById('view-choose').children;
+    const cont = document.getElementById('view-choose');
+    const kwDrp = document.getElementById('choose-kw-drp');
+    for(let i = 0; i < childs.length; i++){
+      childs[i].addEventListener('click', (event) => {
+        const txt = event.target.innerText;
+        if(txt == "Tagesansicht"){
+          dayView();
+          kwDrp.classList.remove('show');
+          kwDrp.classList.add('hidden');
+        }else if(txt == "Wochenansicht"){
+          weekView();
+          kwDrp.classList.remove('hidden');
+          kwDrp.classList.add('show');
+        }
+        cont.classList.remove('show');
+        cont.classList.add('hidden');
+      });
+    }
+  }
+
+  // DROPDOWN WEEK
+  function elKwBtn(){
+    const elem = document.getElementById('kw-button');
+    const drpdwn = document.getElementById('kw-choose');
+    elem.addEventListener('click', (event) => {
+      if(drpdwn.classList.contains('hidden')){
+        drpdwn.classList.remove('hidden');
+        drpdwn.classList.add('show');
+      }else{
+        drpdwn.classList.remove('show');
+        drpdwn.classList.add('hidden');
+      }
+    });
+  }
+  
+  function elKwChoose(){
+    const elems = document.getElementById('kw-choose').children;
+    const btn = document.getElementById('kw-button-text');
+    for(let i = 0; i < elems.length; i++){
+      elems[i].addEventListener('click', (event) => {
+        document.getElementById('kw-choose').classList.remove('show');
+        document.getElementById('kw-choose').classList.add('hidden');
+        changeDatesAtWeekTable(parseInt(event.target.innerHTML.replace("KW", "").trim()));
+        btn.innerHTML = event.target.innerHTML;
+      });
+    }
+  }
+ 
+  function fillKWToDropdown(){
+    const kw = getKW();
+    document.getElementById('kw-button-text').innerHTML = "KW " + kw ;
+    const cont = document.getElementById('kw-choose');
+    for(let i = 0; i < 3; i++){
+      let elem = document.createElement('div');
+      elem.innerHTML = "KW " + (kw + i);
+      elem.className = "cursor-pointer";
+      cont.appendChild(elem);
+    }
+    elKwBtn();
+    elKwChoose();
+  }
+  
+  function getKW(datum = new Date()) {
+    const d = new Date(Date.UTC(datum.getFullYear(), datum.getMonth(), datum.getDate()));
+    const tagNum = (d.getUTCDay() + 6) % 7;
+    d.setUTCDate(d.getUTCDate() - tagNum + 3);
+    const ersterDonnerstag = new Date(Date.UTC(d.getUTCFullYear(), 0, 4));
+    const diff = (d - ersterDonnerstag) / (7 * 24 * 3600 * 1000);
+    return 2 + Math.floor(diff);
+  }
+</script>

@@ -1,0 +1,55 @@
+<header class="p-3 bg-gray-900">
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full md:w-[93%] mx-auto items-center">
+    <!-- Logo -->
+    <div class="col-span-1 flex justify-start items-center pl-1 md:pl-5">
+      <img src="/media/svg/logo_white.svg" class="h-20"/>
+    </div>
+
+    <!-- Titel (nur ab md) -->
+    <div class="hidden md:flex justify-center items-center">
+      <span class="text-white text-[27px]">TC STIXNEUSIEDL / GALLBRUNN</span>
+    </div>
+
+    <!-- Navigation / Hamburger -->
+    <div class="flex items-center justify-end">
+      <!-- Normale Links ab md -->
+      <div class="hidden md:flex space-x-1">
+        {{#each navLinks}} 
+          <a href="{{this.href}}" class="{{#if this.active}}text-cyan-400{{else}}text-white{{/if}} hover:text-cyan-200 px-3 py-3 flex items-center">
+            {{this.title}}
+          </a>
+        {{/each}}
+      </div>
+
+      <!-- Hamburger Button für klein -->
+      <div class="md:hidden pr-5">
+        <button id="hamburgerBtn" class="focus:outline-none">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Hamburger-Menü unterhalb des Headers -->
+<div id="hamburgerMenu" class="md:hidden w-full bg-gray-900 text-white hidden flex-col border-t border-white py-2">
+  {{#each navLinks}} 
+    <div class="py-1 pl-3">
+        <a href="{{this.href}}" class="hover:text-cyan-200">
+            {{this.title}}
+        </a>
+    </div>
+  {{/each}}
+</div>
+
+<script>
+  const btn = document.getElementById('hamburgerBtn');
+  const menu = document.getElementById('hamburgerMenu');
+
+  btn.addEventListener('click', () => {
+    menu.classList.toggle('hidden');
+  });
+</script>
