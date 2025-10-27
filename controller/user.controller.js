@@ -22,6 +22,11 @@ const navLinks_dashboard = [
         title: "BUCHUNGEN",
         active: false
     },
+    {
+        href: "/auth/logout",
+        title: "LOGOUT",
+        active: false
+    },
 ]
 
 const navLinks_userManagement = [
@@ -43,6 +48,11 @@ const navLinks_userManagement = [
     {
         href: "/user/usermanagement",
         title: "BUCHUNGEN",
+        active: false
+    },
+    {
+        href: "/auth/logout",
+        title: "LOGOUT",
         active: false
     },
 ]

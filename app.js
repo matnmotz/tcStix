@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const hbs = require("hbs");
+const session = require('express-session');
 
 // ROUTER
 const userRouter = require('./router/user.router');
@@ -28,12 +29,21 @@ hbs.registerHelper("translateRole", function (role) {
     member: "Mitglied"
   };
 
-  return translations[role] || role; // Fallback, falls nicht bekannt
+  return translations[role] || role;
 });
 hbs.registerHelper('not', function(value) {
   return !value;
 });
 
+app.use(session({
+  secret: "aZ83nXf2QW7rGpM1yT0uVc9bDjHsL4", // sollte lang und sicher sein!
+  resave: false,                   // Session nicht jedes Mal speichern, wenn nichts geändert wurde
+  saveUninitialized: false,        // keine leeren Sessions speichern
+  cookie: {
+    maxAge: 1000 * 60 * 60,        // 1 Stunde gültig
+    secure: false                  // true, wenn HTTPS aktiv ist
+  }
+}));
 
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));

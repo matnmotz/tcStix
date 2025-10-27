@@ -11,7 +11,7 @@ const navLinks = [
     },
 ]
 showLandingPage = (req,res) => {
-    res.render("index", {navLinks});
+    res.render("index", {navLinks,showTitle: true});
 }
 
 module.exports = {
