@@ -31,6 +31,15 @@ hbs.registerHelper("translateRole", function (role) {
 
   return translations[role] || role;
 });
+hbs.registerHelper("translateBookingType", function (bookingType) {
+  const translations = {
+    reservation: "Reservierung",
+    championship: "Meisterschaft",
+    closed: "Gesperrt"
+  };
+
+  return translations[bookingType] || bookingType;
+});
 hbs.registerHelper('not', function(value) {
   return !value;
 });
