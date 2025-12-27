@@ -120,6 +120,8 @@
   fillViewDropdown();
   createWeekTable();
   createDayTable();
+  fillData(getKW());
+  fillDataDayView(new Date());
   // SET right table for VP
   const mediaQuery = window.matchMedia("(max-width: 1024px)");
 
@@ -248,6 +250,8 @@
     input.addEventListener('change', (event) => {
       const date = new Date(input.value);
       document.getElementById('dayView-weekday').innerText = weekdays[date.getDay()];
+      clearTbodyDayView();
+      fillDataDayView(date);
     })
   }
   
@@ -378,15 +382,17 @@
     });
   }
   
-  function elKwChoose(){
+  async function elKwChoose(){
     const elems = document.getElementById('kw-choose').children;
     const btn = document.getElementById('kw-button-text');
     for(let i = 0; i < elems.length; i++){
-      elems[i].addEventListener('click', (event) => {
+      elems[i].addEventListener('click', async(event) => {
         document.getElementById('kw-choose').classList.remove('show');
         document.getElementById('kw-choose').classList.add('hidden');
-        changeDatesAtWeekTable(parseInt(event.target.innerHTML.replace("KW", "").trim()));
         btn.innerHTML = event.target.innerHTML;
+        changeDatesAtWeekTable(parseInt(event.target.innerHTML.replace("KW", "").trim()));
+        await clearTbody();
+        await fillData(event.target.innerHTML.replace("KW", "").trim());
       });
     }
   }
@@ -413,4 +419,209 @@
     const diff = (d - ersterDonnerstag) / (7 * 24 * 3600 * 1000);
     return 2 + Math.floor(diff);
   }
+
+  function fillData(kw){
+    const bookingTypes = {{{json @root.bookingTypes}}};
+    let closureColor = '#ff0000';
+    for(let i = 0; i < bookingTypes.length; i++){
+      if(bookingTypes[i].title == 'closed'){
+        closureColor = bookingTypes[i].hexCode;
+        break;
+      }
+    }
+    const bookings = {{{json bookingsForTable}}};
+    const tr = document.getElementById('timeTableBody').children;
+    let startdate = getMondayAndSundayOfKW(kw).monday;
+    let enddate = getMondayAndSundayOfKW(kw).sunday;
+    for(let i = 0; i < bookings.length; i++){
+      let x = 0;
+      let y = 0;
+      if(new Date(bookings[i].date.split("T")[0]) <= enddate && new Date(bookings[i].date.split("T")[0]) >= startdate){
+        let startHH = parseInt(bookings[i].starttime.split(":")[0]);
+        let startMM = parseInt(bookings[i].starttime.split(":")[1]);
+        let endHH = parseInt(bookings[i].endtime.split(":")[0]);
+        let endMM = parseInt(bookings[i].endtime.split(":")[1]);
+        x = 1 + getWeekdayFromDate(bookings[i].date)*2;
+        x = (bookings[i].courtCourtID == 2)? ++x : x;
+        y = (parseInt(bookings[i].starttime.split(":")[0]) - 6) * 2;
+        y = (parseInt(bookings[i].starttime.split(":")[1]) == 30)? ++y : y;
+        let hh = startHH;
+        let mm = startMM;
+        let hexCode = "#000000";
+        for(let j = 0; j < bookingTypes.length; j++){
+          if(bookingTypes[j].title == bookings[i].booking_type){
+            hexCode = bookingTypes[j].hexCode;
+            break;
+          }
+        }
+        while(hh < endHH  || mm < endMM){
+            if(y % 2 != 0){
+              if(rgbToHex(tr[y].children[x-1].style.backgroundColor) != closureColor){
+                tr[y].children[x-1].style.backgroundColor = hexCode;
+                tr[y].children[x-1].dataset.tooltip = bookings[i].userUserID;
+                tr[y].children[x-1].classList.remove(...'border'.split(" "));
+                tr[y].children[x-1].classList.add(...'border-r border-l'.split(" "));
+              }
+            }else{
+              if(rgbToHex(tr[y].children[x].style.backgroundColor) != closureColor){
+                tr[y].children[x].style.backgroundColor = hexCode;
+                tr[y].children[x].dataset.tooltip = bookings[i].userUserID;
+                tr[y].children[x].classList.remove(...'border'.split(" "));
+                tr[y].children[x].classList.add(...'border-r border-l'.split(" "));
+              }
+            }
+          hh = (mm == 30)? ++hh : hh;
+          mm = (mm == 30)? 00 : 30;
+          y++;
+        }
+      }
+    }
+
+  }
+
+  function fillDataDayView(d){
+    const tr = document.getElementById('dayTimeTableBody').children;
+    const date = new Date(d);
+    let closureColor = '#ff0000';
+    const bookingTypes = {{{json bookingTypes}}};
+    for(let i = 0; i < bookingTypes.length; i++){
+      if(bookingTypes[i].title == 'closed'){
+        closureColor = bookingTypes[i].hexCode;
+        break;
+      }
+    }
+    const bookings = {{{json bookingsForTable}}};
+
+    for(let i = 0; i < bookings.length; i++){
+
+      if(new Date(bookings[i].date.split("T")[0]).toDateString() == date.toDateString()){
+        console.log(bookings[i]);
+        let x = (parseInt(bookings[i].courtCourtID) == 1)? 1 : 2;
+        let y = (parseInt(bookings[i].starttime.split(":")[0]) - 6) * 2;
+        y = (parseInt(bookings[i].starttime.split(":")[1]) == 30)? ++y : y;
+        let startHH = parseInt(bookings[i].starttime.split(":")[0]);
+        let startMM = parseInt(bookings[i].starttime.split(":")[1]);
+        let endHH = parseInt(bookings[i].endtime.split(":")[0]);
+        let endMM = parseInt(bookings[i].endtime.split(":")[1]);
+        let hh = startHH;
+        let mm = startMM;
+        let hexCode = "#000000";
+        for(let j = 0; j < bookingTypes.length; j++){
+          if(bookingTypes[j].title == bookings[i].booking_type){
+            hexCode = bookingTypes[j].hexCode;
+            break;
+          }
+        }
+        while(hh < endHH  || mm < endMM){
+            if(y % 2 != 0){
+              if(rgbToHex(tr[y].children[x-1].style.backgroundColor) != closureColor){
+                tr[y].children[x-1].style.backgroundColor = hexCode;
+                tr[y].children[x-1].dataset.tooltip = bookings[i].userUserID;
+                tr[y].children[x-1].classList.remove(...'border'.split(" "));
+                tr[y].children[x-1].classList.add(...'border-r border-l'.split(" "));
+              }
+            }else{
+              if(rgbToHex(tr[y].children[x].style.backgroundColor) != closureColor){
+                tr[y].children[x].style.backgroundColor = hexCode;
+                tr[y].children[x].dataset.tooltip = bookings[i].userUserID;
+                tr[y].children[x].classList.remove(...'border'.split(" "));
+                tr[y].children[x].classList.add(...'border-r border-l'.split(" "));
+              }
+            }
+          hh = (mm == 30)? ++hh : hh;
+          mm = (mm == 30)? 00 : 30;
+          y++;
+        }
+      }
+    }
+  }
+
+
+  function clearTbody(){
+    const tr = document.getElementById('timeTableBody').children;
+    const MAX_Y = 31;
+    for(let y = 0; y <= MAX_Y; y++){
+      for(let x = 1; x < tr[y].children.length; x++){
+        if(x % 2 != 0){
+          if(tr[y].children[x-1].classList.contains('border-l')){
+            tr[y].children[x-1].classList.remove('border-l');
+            tr[y].children[x-1].classList.remove('border-r');
+            tr[y].children[x-1].classList.add('border');
+          }
+          tr[y].children[x-1].style.backgroundColor = "";
+        }
+        if(tr[y].children[x].classList.contains('border-l')){
+          tr[y].children[x].classList.remove('border-l');
+          tr[y].children[x].classList.remove('border-r');
+          tr[y].children[x].classList.add('border');
+        }
+        tr[y].children[x].style.backgroundColor = "";
+      }
+    }
+  }
+
+  function clearTbodyDayView(){
+    const tr = document.getElementById('dayTimeTableBody').children;
+    console.log(tr);
+    for(let y = 0; y < tr.length; y++){
+      for(let x = 1; x < tr[y].children.length; x++){
+        if(x % 2 != 0){
+          if(tr[y].children[x-1].classList.contains('border-l')){
+            tr[y].children[x-1].classList.remove('border-l');
+            tr[y].children[x-1].classList.remove('border-r');
+            tr[y].children[x-1].classList.add('border');
+          }
+          tr[y].children[x-1].style.backgroundColor = "";
+        }
+        if(tr[y].children[x].classList.contains('border-l')){
+          tr[y].children[x].classList.remove('border-l');
+          tr[y].children[x].classList.remove('border-r');
+          tr[y].children[x].classList.add('border');
+        }
+        tr[y].children[x].style.backgroundColor = "";
+      }
+    }
+  }
+
+  function getMondayAndSundayOfKW(kw, year = new Date().getFullYear()) {
+      const jan1 = new Date(year, 0, 1);
+      const jan1Day = jan1.getDay() || 7;
+
+      const firstMonday = new Date(jan1);
+      firstMonday.setDate(jan1.getDate() + (1 - jan1Day));
+
+      const monday = new Date(firstMonday);
+      monday.setDate(firstMonday.getDate() + (kw - 1) * 7);
+
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 0, 0); 
+
+      return { monday, sunday };
+  }
+
+  function formatDateSQL(d){
+    const date = new Date(d);
+    const yyyy = date.getFullYear();
+    const mm = date.getMonth();
+    const dd = date.getDate();
+    return `${yyyy}-${mm}-${dd}`
+  }
+
+  function getWeekdayFromDate(d){
+    const date = new Date(d);
+    const weekday = (date.getDay() == 0)?6 : date.getDay()-1;
+    console.log(weekday);
+    return weekday;
+  }
+
+  function rgbToHex(rgb) {
+    // rgb = "rgb(255, 0, 0)"
+    const result = rgb.match(/\d+/g);
+    if (!result) return null;
+    return "#" + result
+        .map(x => parseInt(x).toString(16).padStart(2, '0'))
+        .join('');
+  }
+
 </script>

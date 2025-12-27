@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const {createActivityWorkbook, createMembershipWorkbook} = require('../models/excel.model');
-const {addUser, getUsers, getUsersUserIdAndName, getUser, updateUser, deleteUser,getBookingTypes, updateBookingType, addActivity, getActivitys, getActivity, updateActivity, getCourts, checkFreeCourt, checkUserAllowedBooking, addBooking, getBookings, allowedToDeleteBooking, deleteBooking, addChampionship, getChampionships, deleteChampionship, addClosure, getActiveClosure, updateClosure} = require('../models/user.model');
+const {addUser, getUsers, getUsersUserIdAndName, getUser, updateUser, deleteUser,getBookingTypes, updateBookingType, addActivity, getActivitys, getActivity, updateActivity, getCourts, checkFreeCourt, checkUserAllowedBooking, addBooking, getBookings, allowedToDeleteBooking, deleteBooking, addChampionship, getChampionships, deleteChampionship, addClosure, getActiveClosure, updateClosure, getAllBookingsBetween} = require('../models/user.model');
 
 const navLinks_dashboard = [
     {
@@ -101,6 +101,7 @@ showDashboard = async(req,res) => {
     const championship = await getChampionships();
     const bookingTypes = await getBookingTypes();
     const closure = await getActiveClosure();
+    const bookingsForTable = await getAllBookingsBetween(getWeekRange().monday, getWeekRange().sunday);
     let bColor = '#000000';
     let chColor = '#000000';
     let clColor = '#000000';
@@ -118,11 +119,11 @@ showDashboard = async(req,res) => {
         }
     }
     if(req.query.succ){
-        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, succ: req.query.succ})
+        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, bookingTypes, succ: req.query.succ})
     }else if(req.query.err){
-        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, err: req.query.err})
+        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, bookingTypes, err: req.query.err})
     }else{
-        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure });
+        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, bookingTypes, });
     }
 }
 
@@ -421,6 +422,35 @@ validateBooking = async(data, role, userID) => {
         return "/user?err=Platz ist zu dieser Zeit belegt & Ihnen stehen diese Woche keine Stunden mehr zur Verfügung!";
     }
 }
+
+getWeekRange = () => {
+  const today = new Date();
+
+  const monday = new Date(today);
+  const day = monday.getDay(); 
+
+  // Abstand zum Montag berechnen
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  monday.setDate(monday.getDate() + diffToMonday);
+
+  // Sonntag in 3 Wochen (20 Tage später)
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 20);
+
+  return {
+    monday: formatSQLDate(monday),
+    sunday: formatSQLDate(sunday)
+  };
+}
+
+formatSQLDate = (d) => {
+    const date = new Date(d);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth()+1).padStart(2,"0");
+    const dd = String(date.getDate()).padStart(2,"0");
+    return `${yyyy}-${mm}-${dd}`
+}
+
 
 
 

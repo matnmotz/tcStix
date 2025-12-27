@@ -298,7 +298,9 @@ async function checkFreeCourt(data){
 async function checkUserAllowedBooking(data, roleTitle, userID){
     try{
         if(roleTitle != 'trainer'){
-            //trainer
+            if((parseInt(data.to.split(":")[0]) - parseInt(data.from.split(":")[0])) > 2){
+                return false;
+            }
             //sql format formatter
             const format = (d) => d.toISOString().split("T")[0];
             const toDateOnly = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -311,8 +313,8 @@ async function checkUserAllowedBooking(data, roleTitle, userID){
             const sunday = new Date(monday);
             sunday.setDate(monday.getDate() + 6);
             
-            const sql = "SELECT * FROM booking JOIN booking_user ON bookingID = bookingBookingID WHERE userUserID = ? AND date >= ? AND date <= ?";
-            const [rows] = await mysql.pool.query(sql,[userID, format(monday), format(sunday)]);
+            const sql = "SELECT * FROM booking JOIN booking_user ON bookingID = bookingBookingID WHERE userUserID = ? AND date >= ? AND date <= ? AND booking_type = ?";
+            const [rows] = await mysql.pool.query(sql,[userID, format(monday), format(sunday), 'reservation']);
             let green = true;
             let red = true;
             for(let i = 0; i < rows.length; i++){
@@ -545,6 +547,16 @@ async function updateClosure(noteID, enddatetime, userID){
         console.log(err);
     }
 }
+
+async function getAllBookingsBetween(startdate, enddate){
+    try{
+        const sql = "SELECT booking.*, booking_user.*, DATE_FORMAT(booking.date, '%Y-%m-%d') AS date FROM booking JOIN booking_user ON bookingID = bookingBookingID WHERE date >= ? AND date <= ?";
+        const [rows] = await mysql.pool.query(sql, [startdate, enddate]);
+        return rows;
+    }catch(err){
+        console.log(err);
+    }
+}
 //private functions
 function getSQLTimestamp() {
     const now = new Date();
@@ -614,5 +626,6 @@ module.exports = {
     deleteChampionship,
     addClosure,
     getActiveClosure,
-    updateClosure
+    updateClosure,
+    getAllBookingsBetween
 }
