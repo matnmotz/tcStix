@@ -4,20 +4,24 @@ async function getUserByEmail(email){
     try{
         const sql = "SELECT * FROM user WHERE email = ?";
         const [rows] = await mysql.pool.query(sql, [email]);
-        let result = {
-            userID: rows[0].userID,
-            gender: rows[0].gender,
-            firstname: rows[0].firstname,
-            lastname: rows[0].lastname,
-            email: rows[0].email,
-            password: rows[0].password,
-            street: rows[0].street,
-            houseNumber: rows[0].houseNumber,
-            zip: rows[0].zip,
-            city: rows[0].city,
-            role: await getRoleTitleByRoleId(rows[0].roleRoleID)
+        if(rows.length >= 1){
+            let result = {
+                userID: rows[0].userID,
+                gender: rows[0].gender,
+                firstname: rows[0].firstname,
+                lastname: rows[0].lastname,
+                email: rows[0].email,
+                password: rows[0].password,
+                street: rows[0].street,
+                houseNumber: rows[0].houseNumber,
+                zip: rows[0].zip,
+                city: rows[0].city,
+                role: await getRoleTitleByRoleId(rows[0].roleRoleID)
+            }
+            return result;
+        }else{
+            return undefined;
         }
-        return result;
     }catch(err){
         console.log(err);
     }

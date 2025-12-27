@@ -9,7 +9,12 @@ const navLinks = [
         active: true
     }
 ]
+
+// DASHBOARD
+
 router.get("/", userController.showDashboard);
+
+// USER MANAGEMENT
 
 router.get("/usermanagement", userController.showUserManagement);
 
@@ -22,6 +27,8 @@ router.post("/usermanagement/edit", userController.handleEditUser);
 router.get("/usermanagement/delete/:id", userController.showDeleteUser);
 router.post("/usermanagement/delete", userController.handleDeleteUser);
 
+// COURT MANAGEMENT
+
 router.get("/courtmanagement", userController.showCourtManagement);
 
 router.post("/courtmanagement/bookingtype", userController.handleChangeBookingType)
@@ -32,4 +39,18 @@ router.post("/courtmanagement/activity", userController.handleAddActivity);
 
 router.get("/courtmanagement/download-activitys/:year", userController.showActivityDownload);
 router.get("/courtmanagement/download-membership/:year", userController.showMembershipDownload);
+
+//BOOKING MANAGEMENT
+
+router.get("/booking", userController.showBooking);
+router.post("/booking", userController.handleBooking);
+
+router.post("/booking/delete", userController.handleDeleteBooking);
+
+router.post("/championship", userController.handleChampionship);
+router.post("/championship/delete", userController.handleDeleteChampionship);
+
+router.post("/closure", userController.handleClosure);
+router.post("/closure/update", userController.handleClosureUpdate);
+
 module.exports = router;

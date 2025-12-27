@@ -1,15 +1,480 @@
-<div class="grid lg:grid-cols-[30%_70%] 2xl:grid-cols-[20%_80%] ">
+<div class="grid lg:grid-cols-[30%_70%] 2xl:grid-cols-[20%_80%] scroll-smooth">
     <!-- SIDE BAR -->
-    <div class="bg-gray-100">
-        <div class="text-[17px] my-3 w-full pl-3">
+    <div class="bg-gray-100 px-3 pb-5 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:overflow-y-auto">
+        {{#if err}}
+            <div class="mb-4 mt-5 p-4 rounded-lg border border-red-200 bg-red-50 text-red-700 text-sm text-center shadow-sm">
+                {{err}}
+            </div>
+        {{/if}}
+        {{#if succ}}
+            <div class="mb-4 mt-5 p-4 rounded-lg border border-green-200 bg-green-50 text-green-700 text-sm text-center shadow-sm">
+                {{succ}}
+            </div>
+        {{/if}}
+        <div class="mt-5">
+            <button type="button" class="bg-cyan-600 text-white py-3 px-5 rounded w-full cursor-pointer" onclick="window.location.href='/user/booking'" >
+                + Neue Reservierung
+            </button>
+        </div>
+        {{#if championship}}
+        <div class="text-[17px] my-3 w-full">
+            <h2 class="font-bold">Meisterschaft</h2>
+        </div>
+        <div class="grid gap-2 grid-cols-1">
+        {{#each championship}}
+            <div class="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg transition border border-gray-100 p-4 flex items-center justify-between cursor-pointer">
+                <div class="flex flex-col border-l-5 border-yellow-600 rounded px-3" style="border-color: {{../chColor}};">
+                    <p class="font-semibold text-gray-800 text-lg">vs {{this.note}}</p>
+                    <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                        <!--<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" 
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" 
+                                d="M8 7V3m8 4V3m-9 8h10m-9 4H7m10 0h-1M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z">
+                            </path>
+                        </svg>-->
+                        {{formatDate this.date}} · {{this.starttime}} - {{this.endtime}} Uhr
+                    </p>
+                </div>
+                <div class="bg-yellow-600 p-2 rounded-lg flex items-center justify-center" style="background-color: {{../chColor}};" onclick="openDeleteDialog('{{this.bookingID}}','{{formatDate this.date}}', '{{this.starttime}}', '{{this.endtime}}', '/user/championship/delete/')">
+                    <img src="/media/svg/trash.svg" class="w-5 h-5" />
+                </div>
+            </div>
+        {{/each}}
+        </div>
+        {{/if}}
+        <div class="text-[17px] my-3 w-full">
             <h2 class="font-bold">Meine Buchungen</h2>
         </div>
-        <div>
-            
+        <div class="grid gap-2 grid-cols-1">
+            {{#if bookings}}
+            {{#each bookings}}
+            <div class="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg transition border border-gray-100 p-4 flex items-center justify-between cursor-pointer">
+                <div class="flex flex-col border-l-5 rounded px-3" style="border-color: {{../bColor}};">
+                    <p class="font-semibold text-gray-800 text-lg">Tennisplatz {{this.courtCourtID}}</p>
+                    <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                        <!--<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" 
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" 
+                                d="M8 7V3m8 4V3m-9 8h10m-9 4H7m10 0h-1M5 21h14a2 2 0 002-2V7H3v12a2 2 0 002 2z">
+                            </path>
+                        </svg>-->
+                        {{this.date}} · {{this.starttime}} - {{this.endtime}} Uhr
+                    </p>
+                </div>
+                <div class="p-2 rounded-lg flex items-center justify-center" style="background-color: {{../bColor}};" onclick="openDeleteDialog('{{this.bookingID}}','{{formatDate this.date}}', '{{this.starttime}}', '{{this.endtime}}', '/user/booking/delete/')">
+                    <img src="/media/svg/trash.svg" class="w-5 h-5" />
+                </div>
+            </div>
+            {{/each}}
+            {{else}}
+                <p class="text-gray-600">Keine bevorstehenden Reservierungen!</p>
+            {{/if}}
         </div>
+
     </div>
     <!-- Main Content -->
-    <div>
+    <div class="max-w-full overflow-y-auto">
+        <div class="grid gap-1 lg:grid-cols-2 w-[93%] mx-auto">
+
+            <!-- MEISTERSCHAFT -->
+
+            <div class="mx-auto p-6 w-full">
+                <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 h-full">
+                    <h1 class="text-xl font-bold text-gray-800 mb-2">
+                        MEISTERSCHAFT
+                    </h1>
+
+                    <form action="/user/championship" method="POST" class="space-y-5">
+                        <!-- Gegner -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Gegner
+                            </label>
+                            <input 
+                                type="text" 
+                                name="opponent"
+                                placeholder="TC Musterverein"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm 
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    transition duration-200"
+                            />
+                        </div>
+                        <!-- Datum -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Datum
+                            </label>
+                            <input 
+                                type="date" 
+                                name="champDate"
+                                id="championshipDate"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm 
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    transition duration-200"
+                            />
+                        </div>
+
+                        <!-- Von -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Von
+                                </label>
+                                <input 
+                                    type="time"
+                                    name="champFrom"
+                                    id="championshipFrom"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                        transition duration-200"
+                                />
+                            </div>
+
+                            <!-- Bis -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Bis
+                                </label>
+                                <input 
+                                    type="time"
+                                    name="champTo"
+                                    id="championshipTo"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                        transition duration-200"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Button -->
+                        <div class="pt-4">
+                            <button 
+                                type="submit"
+                                class="w-full md:w-auto bg-cyan-600 text-white font-semibold 
+                                    px-8 py-3 rounded-lg shadow-md hover:bg-cyan-700 
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                                    transition duration-200"
+                            >
+                                Speichern
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+                <!-- PLATZ SPERREN -->
+            
+            <div class="mx-auto p-6 w-full">
+                <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 h-full">
+                    <h1 class="text-xl font-bold text-gray-800 mb-2">
+                        PLATZ SPERREN
+                    </h1>
+
+                    <form class="space-y-5" action="/user/closure/" method="POST">
+
+                        <!-- Von -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Von
+                                </label>
+                                <input 
+                                    type="datetime-local"
+                                    id="closureFrom"
+                                    name="from"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                        transition duration-200"
+                                />
+                            </div>
+
+                            <!-- Bis -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    Bis
+                                </label>
+                                <input 
+                                    type="datetime-local"
+                                    id="closureTo"
+                                    name="to"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm
+                                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                        transition duration-200"
+                                />
+                            </div>
+                        </div>
+                        
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                Tennisplatz
+                            </label>
+                            <select
+                                type="text" 
+                                name="court"
+                                class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm 
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                                    transition duration-200"
+                            />
+                                <option value="1&2">Beide Tennisplätze</option>
+                                <option value="1">Tennisplatz 1</option>
+                                <option value="2">Tennisplatz 2</option>
+                            </select>
+                        </div>
+
+                        <!-- Button -->
+                        <div class="pt-4">
+                            <button 
+                                type="submit"
+                                class="w-full md:w-auto bg-cyan-600 text-white font-semibold 
+                                    px-8 py-3 rounded-lg shadow-md hover:bg-cyan-700 
+                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                                    transition duration-200"
+                            >
+                                Speichern
+                            </button>
+                        </div>
+                    </form>
+                    <!-- AKTIVE SPERRUNG -->
+                    {{#if closure}}
+                    <div class="w-full max-w-5xl mx-auto mt-4
+                                bg-white border border-gray-200 rounded-2xl
+                                shadow-sm hover:shadow-md transition
+                                p-4 md:p-5">
+                        <form action="/user/closure/update/" method="POST">
+                            <input type="hidden" name="noteID" value="{{closure.note}}" />
+                            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                                <!-- LEFT: Status & Info -->
+                                <div class="flex items-start gap-4 flex-1">
+
+                                    <!-- Color Indicator -->
+                                    <div class="w-1.5 rounded-full self-stretch"
+                                        style="background-color: {{clColor}};"></div>
+
+                                    <!-- Text Content -->
+                                    <div class="flex flex-col">
+                                        <p class="text-base font-semibold text-gray-800">
+                                            Aktive Sperrung
+                                        </p>
+
+                                        <p class="mt-1 text-sm text-gray-500">
+                                            Seit: {{formatDate closure.date}} {{closure.starttime}} Uhr
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- MIDDLE: Enddatum -->
+                                    <div class="w-full md:w-auto">
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            Bis
+                                        </label>
+                                        <input
+                                            type="datetime-local"
+                                            name="enddate"
+                                            id="activeClosureDate"
+                                            class="w-full md:w-56
+                                                rounded-lg border border-gray-300
+                                                px-3 py-2 text-sm
+                                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                                    </div>
+
+                                    <!-- RIGHT: Action -->
+                                    <button
+                                        type="submit"
+                                        class="w-full md:w-auto
+                                            px-5 py-2.5
+                                            rounded-lg text-sm font-semibold text-white
+                                            transition hover:opacity-90 active:scale-[0.98]"
+                                        style="background-color: {{clColor}};">
+                                        Aktualisieren
+                                    </button>
+                                
+
+                            </div>
+                        </form>
+                    </div>
+                {{/if}}
+                </div>
+            </div>
+                
+        </div>
         {{> courtTable }}
     </div>
+
+
+    <!-- DELETE-DIALOG  -->
+    <dialog
+    id="deleteConfirmDialog"
+    class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl p-0
+            backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+    >
+
+        <div class="w-full max-w-[90%] bg-white p-6 shadow-2xl lg:max-w-md">
+            <h2 class="mb-3 text-lg font-semibold text-gray-900">
+            Buchung löschen
+            </h2>
+
+            <p class="mb-6 text-sm text-gray-700">
+            Wollen Sie diese Buchung vom
+            <span class="font-medium text-gray-900" id="dialogDate"></span>
+            von
+            <span class="font-medium text-gray-900" id="dialogFrom"></span>
+            bis
+            <span class="font-medium text-gray-900" id="dialogTo"></span>
+            wirklich löschen?
+            </p>
+
+            <div class="flex justify-end gap-3">
+            <button
+                type="button"
+                data-dialog-cancel
+                class="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200
+                    focus:outline-none focus:ring-2 focus:ring-gray-300"
+            >
+                Nein
+            </button>
+
+            <form method="POST" id="dialogForm">
+                <input type="hidden" name="bookingID" id="dialogBookingID" value="" />
+                <input type="hidden" name="date" id="dialogFormDate" value="" />
+                <button
+                    type="submit"
+                    data-dialog-confirm
+                    class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700
+                        focus:outline-none focus:ring-2 focus:ring-red-400"
+                >
+                    Ja
+                </button>
+            </form>
+            </div>
+        </div>
+    </dialog>
 </div>
+
+<script>
+    const dialog = document.getElementById('deleteConfirmDialog');
+    setTodaysValuesInInput();
+    evChampionship();
+
+    // Öffnen des Delete Dialogs
+    function openDeleteDialog(bookingID, date, from, to, action) {
+        dialog.showModal();
+        document.getElementById('dialogDate').innerHTML = date;
+        document.getElementById('dialogFrom').innerHTML = from;
+        document.getElementById('dialogTo').innerHTML = to;
+        document.getElementById('dialogBookingID').value = bookingID;
+        document.getElementById('dialogForm').action = action;
+        document.getElementById('dialogFormDate').value = date;
+    }
+
+    // EV-KLICK Delete Dialog
+    dialog.addEventListener('click', (e) => {
+        if (e.target.closest('[data-dialog-cancel]')) {
+        dialog.close('cancel');
+        }
+
+        if (e.target.closest('[data-dialog-confirm]')) {
+        dialog.close('confirm');
+        // Hier kannst du die Löschlogik triggern
+        console.log('Löschen bestätigt');
+        }
+    });
+
+    function setTodaysValuesInInput(){
+        const formatSQL = (d) => {
+            const dd = String(d.getDate()).padStart(2, "0");
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const yy = d.getFullYear();
+            return `${yy}-${mm}-${dd}`;
+        }
+
+        const cFrom = document.querySelector("#championshipFrom");
+        const cTo = document.querySelector("#championshipTo");
+        const xFrom = document.querySelector("#closureFrom");
+        const xTo = document.querySelector("#closureTo");
+        const cDate = document.querySelector('#championshipDate');
+        const aclDate = document.querySelector('#activeClosureDate');
+        
+        cFrom.value = "09:00";
+        cTo.value = "16:00";
+        cDate.value = formatSQL(getFirstSundayInMayOrAugust());
+        xFrom.value = formatSQL(new Date()) + " 06:00:00";
+        xTo.value = formatSQL(new Date()) + " 22:00:00";
+        aclDate.value = formatSQL(new Date()) +" "+ formatTime(new Date());
+        
+    }
+
+    function getFirstSundayInMayOrAugust() {
+        const today = new Date();
+        const year = today.getFullYear();
+
+        // Hilfsfunktion: erster Sonntag eines Monats
+        const firstSunday = (year, month) => {
+            const d = new Date(year, month, 1); // 1. des Monats
+            const day = d.getDay(); // 0 = Sonntag
+            const offset = (7 - day) % 7;
+            d.setDate(1 + offset);
+            return d;
+        };
+
+        // Monate: 0 = Jan, 4 = Mai, 7 = August
+        const endOfMay = new Date(year, 4, 31);
+        const endOfAug = new Date(year, 7, 31);
+
+        if (today <= endOfMay) {
+            return firstSunday(year, 4); // Mai
+        } else if (today <= endOfMay) {
+            return firstSunday(year, 7); // August
+        } else {
+            return firstSunday(year+1, 4);
+        }
+    }
+
+    function formatDate(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function formatTime(d){
+        let date = new Date(d);
+        let hh = date.getHours();
+        let mm = date.getMinutes();
+        if(mm < 30){
+            mm = (mm < 15)? "00" : "30";
+        }else{
+            hh = (mm < 45)? hh : hh + 1;
+            mm = (mm < 45)? "30" : "00";
+        }
+        return `${hh}:${mm}:00`;
+    }
+
+    function evChampionship(){
+        const from = document.getElementById('championshipFrom');
+        const to = document.getElementById('championshipTo');
+        from.addEventListener('input', (event) => {
+            event.target.value = handleInput(event.target.value);
+        })
+        to.addEventListener('input', (event) => {
+            event.target.value = handleInput(event.target.value);
+        })
+    }
+
+    function handleInput(input){
+        let hh = parseInt(input.substring(0,2));
+        let mm = parseInt(input.substring(3,5));
+        if(mm > 30){
+            hh = (mm < 45)? hh : (hh+1);
+            mm = (mm < 45)? 30 : 00;
+        }else{
+            mm = (mm < 15)? 00 : 30;
+        }
+        return String(hh).padStart(2,"0") + ":" + String(mm).padStart(2,"0");  
+    }
+
+
+</script>

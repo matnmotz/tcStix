@@ -6,7 +6,7 @@
         <!-- Search and add user-->
         <div class="md:grid md:grid-cols-[70%_30%] gap-4 my-3">
             <div class="border rounded-xl flex justify-between bg-gray-100">
-                <input type="text" placeholder="Max Mustermann" id="search" class="h-[45px] px-3 w-full focus:outline-none"/>
+                <input type="text" placeholder="Max Mustermann" id="search" autocomplete="off" class="h-[45px] px-3 w-full focus:outline-none"/>
                 <div class="h-[45px] flex items-center mr-4">
                     <img src="/media/svg/magnifying_glass.svg" class="h-[30px]"/>
                 </div>
@@ -29,7 +29,7 @@
             <tbody>
                 {{#each user}}
                 <tr>
-                    <td>{{this.firstname}} {{this.lastname}}</td>
+                    <td>{{this.lastname}} {{this.firstname}}</td>
                     <td class="hidden md:table-cell">{{this.email}}</td>
                     <td class="hidden lg:table-cell">{{translateRole this.role}}</td>
                     <td class="px-2"><img src="/media/svg/pencil.svg" class="h-[45px] w-full text-white bg-gray-900 px-2 py-2 rounded-xl mx-auto" onclick = "window.location.href='/user/usermanagement/edit/{{this.userID}}'"/></td>

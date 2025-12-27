@@ -22,9 +22,7 @@ hbs.registerHelper("json", function(context) {
 });
 hbs.registerHelper("translateRole", function (role) {
   const translations = {
-    president: "Obmann",
-    treasurer: "Kassier",
-    secretary: "Schriftführer",
+    admin: "Admin",
     groundskeeper: "Platzwart",
     member: "Mitglied"
   };
@@ -43,6 +41,14 @@ hbs.registerHelper("translateBookingType", function (bookingType) {
 hbs.registerHelper('not', function(value) {
   return !value;
 });
+hbs.registerHelper('formatDate', function(date) {
+  date = new Date(date);
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0"); // +1 für korrekten Monat
+  const yy = date.getFullYear();
+  return `${dd}.${mm}.${yy}`;
+});
+
 
 app.use(session({
   secret: "aZ83nXf2QW7rGpM1yT0uVc9bDjHsL4", // sollte lang und sicher sein!

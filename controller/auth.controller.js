@@ -14,18 +14,21 @@ const navLinks = [
 ]
 
 showLogin = (req,res) => {
-    res.render("auth/login", {navLinks, showTitle: true});
+    if(!req.query.msg){
+        res.render("auth/login", {navLinks, showTitle: true});
+    }else{
+        res.render("auth/login", {navLinks, showTitle: true, msg: req.query.msg});
+    }
 }
 
 handleLogin = async(req,res) => {
     const {email, password} = req.body;
     const user = await getUserByEmail(email);
-    if(await bcrypt.compare(password, user.password) && email == user.email){
+    if(user != undefined && await bcrypt.compare(password, user.password) && email == user.email){
         req.session.user = user;
-        console.log(req.session.user);
         res.redirect("/user");
     }else{
-        res.redirect("/auth/login");
+        res.redirect("/auth/login?msg=E-Mail Adresse und/oder Passwort ist falsch!");
     }
 }
 

@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const {createActivityWorkbook, createMembershipWorkbook} = require('../models/excel.model');
-const {addUser, getUsers, getUser, updateUser, deleteUser,getBookingTypes, updateBookingType, addActivity, getActivitys, getActivity, updateActivity} = require('../models/user.model');
+const {addUser, getUsers, getUsersUserIdAndName, getUser, updateUser, deleteUser,getBookingTypes, updateBookingType, addActivity, getActivitys, getActivity, updateActivity, getCourts, checkFreeCourt, checkUserAllowedBooking, addBooking, getBookings, allowedToDeleteBooking, deleteBooking, addChampionship, getChampionships, deleteChampionship, addClosure, getActiveClosure, updateClosure} = require('../models/user.model');
 
 const navLinks_dashboard = [
     {
@@ -9,23 +9,18 @@ const navLinks_dashboard = [
         active: true
     },
     {
-        href: "/user/usermanagement",
-        title: "BENUTZERVERWALTUNG",
-        active: false
-    },
-    {
         href: "/user/courtmanagement",
         title: "TENNISPLATZ",
         active: false
     },
     {
         href: "/user/usermanagement",
-        title: "BUCHUNGEN",
+        title: "BENUTZER",
         active: false
     },
     {
         href: "/auth/logout",
-        title: "LOGOUT",
+        title: "ABMELDEN",
         active: false
     },
 ]
@@ -37,23 +32,18 @@ const navLinks_userManagement = [
         active: false
     },
     {
-        href: "/user/usermanagement",
-        title: "BENUTZERVERWALTUNG",
-        active: true
-    },
-    {
         href: "/user/courtmanagement",
         title: "TENNISPLATZ",
         active: false
     },
     {
         href: "/user/usermanagement",
-        title: "BUCHUNGEN",
-        active: false
+        title: "BENUTZER",
+        active: true
     },
     {
         href: "/auth/logout",
-        title: "LOGOUT",
+        title: "ABMELDEN",
         active: false
     },
 ]
@@ -65,30 +55,78 @@ const navLinks_courtManagement = [
         active: false
     },
     {
-        href: "/user/usermanagement",
-        title: "BENUTZERVERWALTUNG",
-        active: false
-    },
-    {
         href: "/user/courtmanagement",
         title: "TENNISPLATZ",
         active: true
     },
     {
         href: "/user/usermanagement",
-        title: "BUCHUNGEN",
+        title: "BENUTZER",
         active: false
     },
     {
         href: "/auth/logout",
-        title: "LOGOUT",
+        title: "ABMELDEN",
         active: false
     },
 ]
 
-showDashboard = (req,res) => {
-    res.render("user/dashboard",{navLinks: navLinks_dashboard});
+const navLinks_booking = [
+    {
+        href: "/user",
+        title: "DASHBOARD",
+        active: false
+    },
+    {
+        href: "/user/courtmanagement",
+        title: "TENNISPLATZ",
+        active: false
+    },
+    {
+        href: "/user/usermanagement",
+        title: "BENUTZER",
+        active: false
+    },
+    {
+        href: "/auth/logout",
+        title: "ABMELDEN",
+        active: false
+    },
+]
+
+// DASHBOARD
+
+showDashboard = async(req,res) => {
+    const bookings = await getBookings(req.session.user.userID);
+    const championship = await getChampionships();
+    const bookingTypes = await getBookingTypes();
+    const closure = await getActiveClosure();
+    let bColor = '#000000';
+    let chColor = '#000000';
+    let clColor = '#000000';
+    for(let i = 0; i < bookingTypes.length; i++){
+        switch(bookingTypes[i].title){
+            case 'reservation':
+                bColor = bookingTypes[i].hexCode;
+                break
+            case 'championship':
+                chColor = bookingTypes[i].hexCode;
+                break
+            case 'closed':
+                clColor = bookingTypes[i].hexCode;
+                break
+        }
+    }
+    if(req.query.succ){
+        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, succ: req.query.succ})
+    }else if(req.query.err){
+        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, err: req.query.err})
+    }else{
+        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure });
+    }
 }
+
+// USER MANAGEMENT
 
 showUserManagement = async (req,res) => {
     const user = await getUsers();
@@ -175,6 +213,8 @@ handleDeleteUser = async(req,res) => {
     await deleteUser(userID);
     res.redirect("/user/usermanagement");
 }
+
+// COURT MANAGEMENT
 
 showCourtManagement = async(req,res) => {
     const bookingTypes = await getBookingTypes();
@@ -270,6 +310,120 @@ showMembershipDownload = async(req,res) => {
     res.end();
 }
 
+// BOOKING MANAGEMENT
+
+showBooking = async(req,res) => {
+    const users = await getUsersUserIdAndName();
+    const courts = await getCourts();
+    res.render("user/booking", {navLinks: navLinks_booking, users, courts});
+}
+
+handleBooking = async(req,res) => {
+    const {date,from,to,court,partner} = req.body;
+    if(date != null && date != ''){
+        const data = {
+            date,
+            from,
+            to,
+            court,
+            partner,
+            booking_type: 'reservation'
+        }
+        res.redirect(await validateBooking(data, req.session.user.role, req.session.user.userID));
+    }else{
+        res.redirect("/user?err=Bitte gültiges Datum auswählen!");
+    }
+}
+
+handleDeleteBooking = async(req,res) => {
+    const bookingID = req.body.bookingID;
+    if(await allowedToDeleteBooking(req.session.user.userID, bookingID) || req.session.role == 'admin'){
+        await deleteBooking(bookingID);
+        res.redirect("/user?succ=Buchung erfolgreich gelöscht!");
+    }else{
+        res.redirect("/user?err=Nicht berechtigt diese Buchung zu löschen!");
+    }
+}
+
+handleChampionship = async(req,res) => {
+    if(req.session.user != null && req.session.user.role == 'admin'){
+        const {opponent, champDate, champFrom, champTo} = req.body;
+        if(champDate != null && champDate != ""){
+            await addChampionship(opponent, champDate, champFrom, champTo, req.session.user.userID);
+            res.redirect("/user?succ=Meisterschaftstermin erfolgreich hinzugefügt!");
+        }else{
+            res.redirect("/user?err=Bitte gültiges Datum auswählen!");
+        }
+    }else{
+        res.redirect("/user?err=Zugriff verweigert!");
+    }
+    
+}
+
+handleDeleteChampionship = async(req,res) => {
+    const formatDateToISO = (dateStr) => {
+        const [day, month, year] = dateStr.split(".");
+        return `${year}-${month}-${day}`;
+    }
+
+    if(req.session.user != null && req.session.user.role == 'admin'){
+        const {date} = req.body;
+        await deleteChampionship(formatDateToISO(date));
+        res.redirect("/user?succ=Meisterschaftstermin entfernt!");
+    }else{
+        res.redirect("/user?err=Zugriff verweigert!");
+    }
+}
+
+handleClosure = async(req,res) => {
+    const {from,to,court} = req.body;
+    if((from != null && from != "") && (to != null && to != "")){
+        if(from < to){
+            await addClosure(from,to,court,req.session.user.userID);
+            res.redirect("/user?succ=Sperrung erfolgreich eingetragen!");
+        }else{
+            res.redirect("/user?err=Bitte wählen Sie mögliche Zeiten!");
+        }
+    }else{
+        res.redirect("/user?err=Bitte gültiges Datum ein!");
+    }
+}
+
+handleClosureUpdate = async(req,res) => {
+    const {enddate, noteID} = req.body;
+    if(enddate != "" && enddate != null){
+        await updateClosure(noteID, enddate, req.session.user.userID);
+        res.redirect("/user?succ=Sperrung erfolgreich aktualisiert!");
+    }else{
+        res.redirect("/user?err=Bitte wählen Sie ein gültiges Datum!");
+    }
+}
+
+
+
+
+//private methods
+validateBooking = async(data, role, userID) => {
+    const freeCourt = await checkFreeCourt(data);
+    const allowed = await checkUserAllowedBooking(data, role, userID);
+    if(freeCourt && allowed){
+        //Platz frei & Stunden frei => Buchung einfügen
+        await addBooking(data,userID);
+        return "/user?succ=Reservierung erfolgreich!";
+    }else if(!freeCourt && allowed){
+        //Platz zu dieser Zeit belegt
+        return "/user?err=Platz ist zu dieser Zeit belegt!";
+    }else if(freeCourt && !allowed){
+        //Platz frei, alle Stunden aufgebraucht
+        return "/user?err=Ihnen stehen diese Woche keine Stunden mehr zur Verfügung!";
+    }else{
+        //Platz nicht frei und alle Stunden verbraucht
+        return "/user?err=Platz ist zu dieser Zeit belegt & Ihnen stehen diese Woche keine Stunden mehr zur Verfügung!";
+    }
+}
+
+
+
 module.exports = {
     showDashboard,
     showUserManagement,
@@ -284,5 +438,12 @@ module.exports = {
     showActivity,
     handleAddActivity,
     showActivityDownload,
-    showMembershipDownload
+    showMembershipDownload,
+    showBooking,
+    handleBooking,
+    handleDeleteBooking,
+    handleChampionship,
+    handleDeleteChampionship,
+    handleClosure,
+    handleClosureUpdate
 }
