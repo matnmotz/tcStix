@@ -313,7 +313,7 @@ async function checkUserAllowedBooking(data, roleTitle, userID){
             const sunday = new Date(monday);
             sunday.setDate(monday.getDate() + 6);
             
-            const sql = "SELECT * FROM booking JOIN booking_user ON bookingID = bookingBookingID WHERE userUserID = ? AND date >= ? AND date <= ? AND booking_type = ?";
+            const sql = "SELECT * FROM booking JOIN booking_user ON bookingID = bookingBookingID WHERE userUserID = ? AND date >= ? AND date <= ? AND booking_type = ? AND activity = 'active'";
             const [rows] = await mysql.pool.query(sql,[userID, format(monday), format(sunday), 'reservation']);
             let green = true;
             let red = true;
@@ -347,6 +347,56 @@ async function checkUserAllowedBooking(data, roleTitle, userID){
     }
 }
 
+async function addAbo(data){
+    try{
+        let date = new Date(data.firstDay);
+        const sql = "INSERT INTO booking (bookingID, booking_type, starttime, endtime, date, timestamp, courtCourtID, note) VALUES (?,?,?,?,?,?,?,?)";
+        const sql_user = "INSERT INTO booking_user (bookingBookingID, userUserID, activity) VALUES (?,?,?)";
+        const noteID = await getUUID();
+        while(date < new Date(data.lastDay)){
+            let bookingID = await getUUID();
+            await mysql.pool.query(sql, [bookingID, 'reservation', data.from+":00", data.to+":00",dateToSqlFormat(date), await getSQLTimestamp(), data.court, noteID]);
+            for(let i = 0; i < data.members.length; i++){
+                await mysql.pool.query(sql_user, [bookingID, data.members[i].id, data.members[i].status]);
+            }
+            date.setDate(date.getDate() + 7);
+        }
+    }catch(err){
+        console.log(err);
+    }
+}
+
+async function getAbos(){
+    try{
+        const sql = "SELECT booking.*, DATE(booking.date) AS dateOnly FROM booking WHERE booking_type = ? AND note IS NOT NULL GROUP BY note";
+        const [rows] = await mysql.pool.query(sql, ['reservation']);
+        console.log(rows);
+        for(let i = 0; i < rows.length; i++){
+            rows[i].weekday = new Date(rows[i].dateOnly).getDay();
+            rows[i].starttime = rows[i].starttime.split(":")[0]+":"+rows[i].starttime.split(":")[1];
+            rows[i].endtime = rows[i].endtime.split(":")[0]+":"+rows[i].endtime.split(":")[1];
+        }
+        return rows;
+    }catch(err){
+        console.log(err);
+    }
+}
+
+async function deleteAbo(noteID){
+    try{
+        let sql = "SELECT bookingID FROM booking WHERE note = ? AND booking_type = 'reservation'";
+        const [rows] = await mysql.pool.query(sql, [noteID]);
+        sql = "DELETE FROM booking_user WHERE bookingBookingID = ?";
+        for(let i = 0; i < rows.length; i++){
+            await mysql.pool.query(sql, [rows[i].bookingID]);
+        }
+        sql = "DELETE FROM booking WHERE note = ? AND booking_type = 'reservation'";
+        await mysql.pool.query(sql, [noteID]);
+    }catch(err){
+        console.log(err);
+    }
+}
+
 async function addBooking(data, userID){
     try{
         data.from = timeToSqlTimeFormat(data.from);
@@ -355,8 +405,8 @@ async function addBooking(data, userID){
         const uuid = await getUUID();
         let sql = "INSERT INTO booking (bookingID, booking_type, starttime, endtime, date, timestamp, courtCourtID) VALUES (?,?,?,?,?,?,?)";
         await mysql.pool.query(sql, [uuid, data.booking_type, data.from, data.to, data.date, getSQLTimestamp(), data.court]);
-        sql = "INSERT INTO booking_user (bookingBookingID, userUserID) VALUES (?,?)";
-        await mysql.pool.query(sql, [uuid, userID]);
+        sql = "INSERT INTO booking_user (bookingBookingID, userUserID, activity) VALUES (?,?,?)";
+        await mysql.pool.query(sql, [uuid, userID, 'active']);
     }catch(err){
         console.log(err);
     }
@@ -512,7 +562,6 @@ async function addClosure(from,to,courtParam,userID){
                 await mysql.pool.query(sql_user, [bookingID, userID]);
             }
         }
-        console.log("Fehlerlos durchgeführt!");
     }catch(err){
         console.log(err);
     }
@@ -617,6 +666,9 @@ module.exports = {
     getCourts,
     checkFreeCourt,
     checkUserAllowedBooking,
+    addAbo,
+    getAbos,
+    deleteAbo,
     addBooking,
     getBookings,
     deleteBooking,

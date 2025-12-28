@@ -1,0 +1,324 @@
+<div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mt-12 mb-12">
+
+    <!-- Titel -->
+    <h2 class="text-2xl font-semibold text-gray-800 text-center">
+        Abonnement-Reservierung
+    </h2>
+    <p class="text-center mb-6 text-gray-500 text-sm">Buchung nur im selben Jahr möglich!</p>
+
+    <form action="/user/abo" method="POST" class="space-y-5" id="aboForm">
+
+        <!-- Startmonat -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Von (Monat)</label>
+            <select 
+                name="startMonth"
+                id = "startMonth"
+                class="w-full rounded-lg border border-gray-300 p-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+            >
+            </select>
+        </div>
+
+        <!-- Endmonat -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Bis (Monat)</label>
+            <select 
+                name="endMonth"
+                id="endMonth"
+                class="w-full rounded-lg border border-gray-300 p-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+            >
+            </select>
+        </div>
+
+        <!-- Wochentag -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Wochentag</label>
+            <select 
+                name="weekday"
+                class="w-full rounded-lg border border-gray-300 p-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+            >
+                <option value="1">Montag</option>
+                <option value="2">Dienstag</option>
+                <option value="3">Mittwoch</option>
+                <option value="4">Donnerstag</option>
+                <option value="5">Freitag</option>
+                <option value="6">Samstag</option>
+                <option value="0">Sonntag</option>
+            </select>
+        </div>
+
+        <!-- Startzeit -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Von (Uhrzeit)</label>
+            <input 
+                type="time"
+                name="from"
+                id="from"
+                class="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+                required
+            />
+        </div>
+
+        <!-- Endzeit -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Bis (Uhrzeit)</label>
+            <input 
+                type="time"
+                name="to"
+                id="to"
+                class="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+                required
+            />
+        </div>
+
+        <!-- Tennisplatz -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tennisplatz</label>
+            <select 
+                name="court"
+                class="w-full rounded-lg border border-gray-300 p-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+            >
+                {{#each courts}}
+                    <option value="{{this.courtID}}">{{this.title}}</option>
+                {{/each}}
+            </select>
+        </div>
+        <!-- Mitglieder -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Mitglieder</label>
+            <hr class="border-gray-300" />
+            <input type="hidden" id="hiddenMemberList" name="members" >
+            <div id="memberBody" class="grid grid-cols-1 md:grid-cols-2 gap-3 p-2"></div>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Mitglieder hinzufügen</label>
+            <input 
+                type="text"
+                id="memberInput"
+                placeholder="Max Mustermann"
+                class="w-full rounded-lg border border-gray-300 p-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition"
+            />
+        </div>
+        <div>
+            <select class="w-full rounded-lg border border-gray-300 p-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-500 transition" id="activeSelect">
+                <option value="active">aktiv</option>
+                <option value="passive">passiv</option>
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <hr class="border-gray-300" />
+            <table>
+                <tbody id="memberList"></tbody>
+            </table>
+        </div>
+        <!-- Buttons -->
+        <div class="pt-4 flex justify-end">
+            <button
+                type="button"
+                class="bg-cyan-600 hover:bg-cyan-700 text-white font-medium px-6 py-2.5 rounded-lg shadow transition mr-3"
+                onclick="window.location.href='/user'"
+            >
+                Zurück
+            </button>
+            <button 
+                type="submit"
+                class="bg-cyan-600 hover:bg-cyan-700 text-white font-medium px-6 py-2.5 rounded-lg shadow transition"
+            >
+                Abo speichern
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    const members = [];
+    setTodaysValues();
+    evMember();
+    evForm();
+    autoAdaptTime();
+
+    function setTodaysValues(){
+        const months = ["Jänner","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+        const startMonth = document.getElementById('startMonth');
+        const endMonth = document.getElementById('endMonth');
+        for(let i = 1; i <= months.length; i++){
+            let option = document.createElement('option');
+            option.value = i;
+            option.innerHTML = months[i-1];
+            startMonth.appendChild(option);
+            endMonth.appendChild(option.cloneNode(true));
+        }
+        startMonth.value="4";
+        endMonth.value="10";
+        const from = document.getElementById('from');
+        const to = document.getElementById('to');
+        from.value = "18:00";
+        to.value = "20:00";
+    }
+
+    function evMember(){
+        const user = {{{json users}}};
+        const memberIn = document.getElementById('memberInput');
+        const memberBody = document.getElementById('memberBody');
+        memberIn.addEventListener('input', (event) => {
+            clearMemberList();
+            if(event.target.value.trim().length >= 3){
+                let txt = event.target.value.toLowerCase().split(" ");
+                for(let i = 0; i < user.length; i++){
+                    if(txt.length == 1){
+                        if(user[i].firstname.toLowerCase().startsWith(txt[0]) || user[i].lastname.toLowerCase().startsWith(txt[0])){
+                            showUser(user[i].userID, user[i].firstname + " " + user[i].lastname);
+                        }
+                    }else{
+                        if((user[i].firstname.toLowerCase() == txt[0] && user[i].lastname.toLowerCase().startsWith(txt[1])) || (user[i].lastname.toLowerCase() == txt[0] && user[i].firstname.toLowerCase().startsWith(txt[1]))){
+                            showUser(user[i].userID, user[i].firstname + " " + user[i].lastname);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    function showUser(id, name){
+        const memberList = document.getElementById('memberList');
+        let tr = document.createElement('tr');
+        tr.onclick = function () {
+            addUserToMembers(id, name);
+        };
+        let td = document.createElement('td');
+        td.classList.add(...'cursor-pointer'.split(" "));
+        td.innerHTML = name;
+        tr.appendChild(td);
+        memberList.appendChild(tr);
+    }
+
+    function clearMemberList(){
+        const memberList = document.getElementById('memberList');
+        while(memberList.firstChild){
+            memberList.removeChild(memberList.firstChild);
+        }
+    }
+
+    function addUserToMembers(id, name){
+        if(!userAlreadyAdded(id)){
+            const activeSel = document.getElementById('activeSelect');
+            const memberBody = document.getElementById('memberBody');
+            const memberIn = document.getElementById('memberInput');
+            members.push({
+                id,
+                name, 
+                status: activeSel.value
+            });
+            let div = document.createElement('div');
+            let span = document.createElement('span');
+            span.innerText = name;
+            div.appendChild(span);
+            let button = document.createElement('button');
+            button.type = "button";
+            button.innerText = "x";
+            button.classList.add(...'hover:text-[red]'.split(" "));
+            button.onclick = () => {
+                removeMember(button.parentElement.children[0].innerText, button.parentElement);
+            }
+            div.appendChild(button);
+            div.classList.add(...'p-2 rounded-lg flex justify-between'.split(" "));
+            if(activeSel.value == 'active'){
+                div.classList.add('bg-cyan-300');
+            }else{
+                div.classList.add('bg-cyan-100');
+            }
+            memberBody.appendChild(div);
+            memberIn.value = "";
+            activeSel.value = "active";
+            clearMemberList();
+        }
+    }
+
+    function userAlreadyAdded(id){
+        for(let i = 0; i < members.length; i++){
+            if(members[i].id == id){
+                alert("Sie können keinen Benutzer doppelt hinzufügen!");
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    function removeMember(name, parent){
+        for(let i = 0; i < members.length; i++){
+            if((members[i].firstname + " " + members[i].lastname) == name){
+                members.splice(i,1);
+                break;
+            }
+        }
+        parent.remove();
+    }
+
+    function evForm(){
+        const form = document.getElementById('aboForm');
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            writeDataIntoInput();
+            if(document.getElementById('from').value < document.getElementById('to').value){
+                if(document.getElementById('hiddenMemberList').value.trim() != ""){
+                    form.submit();
+                }else{
+                    alert("Bitte fügen Sie Spieler hinzu!");
+                }
+            }else{
+                alert("Bitte wählen Sie gültige Zeiten!");
+            }
+        });
+    }
+
+    function writeDataIntoInput(){
+        const hidMemberList = document.getElementById('hiddenMemberList');
+        let string = "";
+        console.log(members);
+        for(let i = 0; i < members.length; i++){
+            string = string + members[i].id + ";" + members[i].status
+            if(i != (members.length -1)){
+                string += "/";
+            }
+        }
+        hidMemberList.value = string;
+    }
+
+    function autoAdaptTime(){
+        const from = document.getElementById('from');
+        const to = document.getElementById('to');
+        from.addEventListener('input', (event) => {
+            from.value = validateTime(from.value, "from");
+        })
+        to.addEventListener('input', (event) => {
+            to.value = validateTime(to.value, "to");
+        })
+    }
+    
+    function validateTime(t, type){
+        const minTime = 6;
+        const maxTime = 22;
+        
+        let hour = parseInt(t.substring(0,2));
+        const min = parseInt(t.substring(3,5));
+
+        if(hour >= minTime && hour <= maxTime){
+            hour = String(hour).padStart(2,"0");
+            if(min < 30){
+                //unter 30min ausgewählt
+                return (min < 15) ? `${String(hour).padStart(2,"0")}:00` : `${String(hour).padStart(2,"0")}:30`;
+            }else{
+                //über 30min ausgewählt
+                return (min < 45) ? `${String(hour).padStart(2,"0")}:30` : `${String(parseInt(hour)+1).padStart(2,"0")}:00`;
+            }
+        }else if(hour < minTime){
+            // unter 6 Uhr
+            return (type == 'from')? '06:00' : '07:00';
+        }else if(hour > maxTime){
+            // über 22Uhr
+            return (type == 'from')? '21:00' : '22:00';
+        }
+    }
+</script>

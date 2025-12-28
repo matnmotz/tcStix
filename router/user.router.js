@@ -41,6 +41,12 @@ router.get("/courtmanagement/download-activitys/:year", userController.showActiv
 router.get("/courtmanagement/download-membership/:year", userController.showMembershipDownload);
 
 //BOOKING MANAGEMENT
+router.get("/abo", userController.showAbo);
+router.post("/abo", userController.handleAbo);
+
+router.get("/abonnements", userController.showAbonnements);
+
+router.get("/abo/:id/delete", userController.showDeleteAbo);
 
 router.get("/booking", userController.showBooking);
 router.post("/booking", userController.handleBooking);

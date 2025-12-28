@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const {createActivityWorkbook, createMembershipWorkbook} = require('../models/excel.model');
-const {addUser, getUsers, getUsersUserIdAndName, getUser, updateUser, deleteUser,getBookingTypes, updateBookingType, addActivity, getActivitys, getActivity, updateActivity, getCourts, checkFreeCourt, checkUserAllowedBooking, addBooking, getBookings, allowedToDeleteBooking, deleteBooking, addChampionship, getChampionships, deleteChampionship, addClosure, getActiveClosure, updateClosure, getAllBookingsBetween} = require('../models/user.model');
+const {addUser, getUsers, getUsersUserIdAndName, getUser, updateUser, deleteUser,getBookingTypes, updateBookingType, addActivity, getActivitys, getActivity, updateActivity, getCourts, checkFreeCourt, checkUserAllowedBooking, addAbo, addBooking, getBookings, allowedToDeleteBooking, deleteBooking, addChampionship, getChampionships, deleteChampionship, addClosure, getActiveClosure, updateClosure, getAllBookingsBetween, getAbos, deleteAbo} = require('../models/user.model');
 
 const navLinks_dashboard = [
     {
@@ -313,6 +313,63 @@ showMembershipDownload = async(req,res) => {
 
 // BOOKING MANAGEMENT
 
+showAbo = async(req,res) => {
+    const users = await getUsersUserIdAndName();
+    const courts = await getCourts();
+    res.render("user/abo",{navLinks: navLinks_booking, users, courts});
+}
+
+handleAbo = async(req,res) => {
+    const { startMonth, endMonth, weekday, from, to, court, members} = req.body;
+    if(
+        (startMonth.trim() != "" && startMonth.trim() != null) && 
+        (endMonth.trim() != "" && endMonth.trim() != null) &&
+        (weekday.trim() != "" && weekday.trim() != null) &&
+        (from.trim() != "" && from.trim() != null) &&
+        (to.trim() != "" && to.trim() != null) &&
+        (court.trim() != "" && court.trim() != null) &&
+        (members.trim() != "" && members.trim() != null)
+    ){
+        const membersArr = [];
+        let split = members.split("/");
+        for(let i = 0; i < split.length; i++){
+            let splitSemiko = split[i].split(";");
+            membersArr.push({
+                id: splitSemiko[0],
+                status: splitSemiko[1]
+            })
+        }
+        let data = {
+            firstDay: formatSQLDate(getFirstDayOfMonth(weekday,startMonth)),
+            lastDay: formatSQLDate(getFirstDayOfMonth(weekday,endMonth+1)),
+            from,
+            to,
+            court,
+            members: membersArr,
+        };
+        console.log("LETS GOOOO!");
+        await addAbo(data);
+        res.redirect("/user/abo");
+    }else{
+        res.redirect("/user/abo");
+    }
+}
+
+showAbonnements = async(req,res) =>{
+    const abos = await getAbos();
+    res.render("user/abonnements", {navLinks_booking, abos});
+}
+
+showDeleteAbo = async(req,res) => {
+    if(req.session.user != null && req.session.user.role == "admin"){
+        const noteID = req.params.id;
+        await deleteAbo(noteID);
+        res.redirect("/user/abonnements");
+    }else{
+        res.redirect("/user?err=Zugriff verweigert!");
+    }
+}
+
 showBooking = async(req,res) => {
     const users = await getUsersUserIdAndName();
     const courts = await getCourts();
@@ -451,6 +508,20 @@ formatSQLDate = (d) => {
     return `${yyyy}-${mm}-${dd}`
 }
 
+function getFirstDayOfMonth(weekday, month) {
+    const year = new Date().getFullYear(); // aktuelles Jahr
+    const firstOfMonth = new Date(year, month - 1, 1);
+    const firstWeekday = firstOfMonth.getDay(); // 0–6
+
+    let diff = weekday - firstWeekday;
+    if (diff < 0) {
+        diff += 7;
+    }
+
+    return new Date(year, month - 1, diff);
+}
+
+
 
 
 
@@ -475,5 +546,9 @@ module.exports = {
     handleChampionship,
     handleDeleteChampionship,
     handleClosure,
-    handleClosureUpdate
+    handleClosureUpdate,
+    showAbo,
+    handleAbo,
+    showAbonnements,
+    showDeleteAbo
 }

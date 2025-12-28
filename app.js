@@ -48,6 +48,18 @@ hbs.registerHelper('formatDate', function(date) {
   const yy = date.getFullYear();
   return `${dd}.${mm}.${yy}`;
 });
+hbs.registerHelper("weekdayName", function (day) {
+    const days = [
+        "Sonntag",
+        "Montag",
+        "Dienstag",
+        "Mittwoch",
+        "Donnerstag",
+        "Freitag",
+        "Samstag"
+    ];
+    return days[day];
+});
 
 
 app.use(session({
