@@ -341,7 +341,7 @@ handleAbo = async(req,res) => {
         }
         let data = {
             firstDay: formatSQLDate(getFirstDayOfMonth(weekday,startMonth)),
-            lastDay: formatSQLDate(getFirstDayOfMonth(weekday,endMonth+1)),
+            lastDay: formatSQLDate(getFirstDayOfMonth(weekday,parseInt(endMonth)+1)),
             from,
             to,
             court,

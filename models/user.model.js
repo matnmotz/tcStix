@@ -353,7 +353,10 @@ async function addAbo(data){
         const sql = "INSERT INTO booking (bookingID, booking_type, starttime, endtime, date, timestamp, courtCourtID, note) VALUES (?,?,?,?,?,?,?,?)";
         const sql_user = "INSERT INTO booking_user (bookingBookingID, userUserID, activity) VALUES (?,?,?)";
         const noteID = await getUUID();
+        console.log(data.lastDay);
+        console.log("---------------");
         while(date < new Date(data.lastDay)){
+            console.log(date);
             let bookingID = await getUUID();
             await mysql.pool.query(sql, [bookingID, 'reservation', data.from+":00", data.to+":00",dateToSqlFormat(date), await getSQLTimestamp(), data.court, noteID]);
             for(let i = 0; i < data.members.length; i++){

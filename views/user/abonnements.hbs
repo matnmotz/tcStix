@@ -1,10 +1,13 @@
 <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mt-12 mb-12">
 
     <!-- Titel -->
-    <h2 class="text-2xl font-semibold text-gray-800 text-center mb-5">
+    <h2 class="text-2xl font-semibold text-gray-800 text-center">
         Abonnements
     </h2>
-    <div class="space-y-4">
+    <button type="button" class="bg-cyan-600 text-white py-3 px-5 rounded w-full cursor-pointer mt-3" onclick="window.location.href='/user/abo'" >
+        + Neues Abonnement
+    </button>
+    <div class="space-y-4 mt-3">
 
     {{#each abos}}
         <div class="w-full max-w-xl flex justify-between mx-auto bg-white rounded-2xl shadow-md hover:shadow-lg transition border border-gray-100 p-4">
