@@ -45,7 +45,8 @@
 
     <div class="flex justify-end gap-3">
         <button type="button"
-                class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition">
+                class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition"
+                onclick="window.location.href='/user/courtmanagement'">
             Abbrechen
         </button>
         <button type="submit"
@@ -185,6 +186,7 @@
             }
         }
     }
+    const form = document.querySelector('form');
     form.addEventListener('submit', (e) => {
         const btn = document.getElementById('submitBtn');
         btn.disabled = true; 
@@ -198,7 +200,6 @@
         function fillData(){
             const activity = {{{json activity}}};
             document.querySelector("[name=title]").value = activity.title;
-            document.querySelector("[name=hourlyFee]").value = activity.hourlyFee;
             document.querySelector("[name=time]").value = activity.time.toString();
             document.querySelector("[name=date]").value = activity.date;
             console.log(activity.activityID);

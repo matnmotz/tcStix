@@ -65,10 +65,10 @@
         <h2 class="text-lg font-bold">Aktivitäten</h2>
         <div class="flex items-center space-x-2">
           <button class="py-2 px-3 rounded bg-gray-900 text-white cursor-pointer hidden lg:show" onclick="window.location.href='/user/courtmanagement/activity'">Aktivität hinzufügen</button>
-          <button class="py-2 px-3 rounded bg-gray-900 text-white cursor-pointer show lg:hidden" onclick="window.location.href='/user/courtmanagement/activity'">+</button>
+          <button class="py-2 px-3 rounded bg-gray-900 text-white cursor-pointer" onclick="window.location.href='/user/courtmanagement/activity'">+</button>
           <div class="relative">
             <div class="flex items-center bg-gray-900 text-white py-2 px-3 rounded cursor-pointer" id="activityDrpBtn">
-              <span id="activityDrpBtnTxt">2025</span>
+              <span id="activityDrpBtnTxt"></span>
               <img src="/media/svg/arrowhead_down.svg" class="h-5 ml-2"/>
             </div>
             <div class="absolute top-full mt-1 w-max bg-gray-900 text-white rounded-b border-t border-white hidden z-10" id="activityDrpChoose">
@@ -164,6 +164,7 @@
       document.getElementById('downloadMembership').onclick = () => {
         window.location.href = "/user/courtmanagement/download-membership/" + year;
       }
+      document.getElementById('activityDrpBtnTxt').innerText = year;
       for(let i = 0; i < 3; i++){
           let div = document.createElement('div');
           div.className = "px-3 py-1 cursor-pointer hover:bg-gray-700";

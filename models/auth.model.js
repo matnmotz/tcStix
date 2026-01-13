@@ -1,16 +1,16 @@
 const mysql = require('../config/db_config');
 
-async function getUserByEmail(email){
+async function getUserByUsername(username){
     try{
-        const sql = "SELECT * FROM user WHERE email = ?";
-        const [rows] = await mysql.pool.query(sql, [email]);
+        const sql = "SELECT * FROM user WHERE username = ?";
+        const [rows] = await mysql.pool.query(sql, [username]);
         if(rows.length >= 1){
             let result = {
                 userID: rows[0].userID,
                 gender: rows[0].gender,
                 firstname: rows[0].firstname,
                 lastname: rows[0].lastname,
-                email: rows[0].email,
+                username: rows[0].username,
                 password: rows[0].password,
                 street: rows[0].street,
                 houseNumber: rows[0].houseNumber,
@@ -38,5 +38,5 @@ async function getRoleTitleByRoleId(roleID){
 }
 
 module.exports = {
-    getUserByEmail,
+    getUserByUsername,
 }

@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const {createActivityWorkbook, createMembershipWorkbook} = require('../models/excel.model');
 const {addUser, getUsers, getUsersUserIdAndName, getUser, updateUser, deleteUser,getBookingTypes, updateBookingType, addActivity, getActivitys, getActivity, updateActivity, getCourts, checkFreeCourt, checkUserAllowedBooking, addAbo, addBooking, getBookings, allowedToDeleteBooking, deleteBooking, addChampionship, getChampionships, deleteChampionship, addClosure, getActiveClosure, updateClosure, getAllBookingsBetween, getAbos, deleteAbo} = require('../models/user.model');
 
-const navLinks_dashboard = [
+const navLinks_dashboard_admin = [
     {
         href: "/user",
         title: "DASHBOARD",
@@ -17,6 +17,18 @@ const navLinks_dashboard = [
         href: "/user/usermanagement",
         title: "BENUTZER",
         active: false
+    },
+    {
+        href: "/auth/logout",
+        title: "ABMELDEN",
+        active: false
+    },
+]
+const navLinks_dashboard_user = [
+    {
+        href: "/user",
+        title: "DASHBOARD",
+        active: true
     },
     {
         href: "/auth/logout",
@@ -97,267 +109,370 @@ const navLinks_booking = [
 // DASHBOARD
 
 showDashboard = async(req,res) => {
-    const bookings = await getBookings(req.session.user.userID);
-    const championship = await getChampionships();
-    const bookingTypes = await getBookingTypes();
-    const closure = await getActiveClosure();
-    const bookingsForTable = await getAllBookingsBetween(getWeekRange().monday, getWeekRange().sunday);
-    let bColor = '#000000';
-    let chColor = '#000000';
-    let clColor = '#000000';
-    for(let i = 0; i < bookingTypes.length; i++){
-        switch(bookingTypes[i].title){
-            case 'reservation':
-                bColor = bookingTypes[i].hexCode;
-                break
-            case 'championship':
-                chColor = bookingTypes[i].hexCode;
-                break
-            case 'closed':
-                clColor = bookingTypes[i].hexCode;
-                break
+    if(req.session.user != null && req.session.user != undefined){
+        const isAdmin = (req.session.user.role == 'admin')? true : false;
+        const bookings = await getBookings(req.session.user.userID);
+        console.log(bookings);
+        const championship = await getChampionships();
+        const bookingTypes = await getBookingTypes();
+        const closure = await getActiveClosure();
+        const bookingsForTable = await getAllBookingsBetween(getWeekRange().monday, getWeekRange().sunday);
+        let showNames = (req.session.user != null)? true : false;
+        let bColor = '#000000';
+        let chColor = '#000000';
+        let clColor = '#000000';
+        for(let i = 0; i < bookingTypes.length; i++){
+            switch(bookingTypes[i].title){
+                case 'reservation':
+                    bColor = bookingTypes[i].hexCode;
+                    break
+                case 'championship':
+                    chColor = bookingTypes[i].hexCode;
+                    break
+                case 'closed':
+                    clColor = bookingTypes[i].hexCode;
+                    break
+            }
         }
-    }
-    if(req.query.succ){
-        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, bookingTypes, succ: req.query.succ})
-    }else if(req.query.err){
-        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, bookingTypes, err: req.query.err})
+        if(req.query.succ){
+            res.render("user/dashboard",{navLinks: (isAdmin)? navLinks_dashboard_admin : navLinks_dashboard_user, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, showNames, isAdmin, bookingTypes, succ: req.query.succ})
+        }else if(req.query.err){
+            res.render("user/dashboard",{navLinks: (isAdmin)? navLinks_dashboard_admin : navLinks_dashboard_user, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, showNames, isAdmin, bookingTypes, err: req.query.err})
+        }else{
+            res.render("user/dashboard",{navLinks: (isAdmin)? navLinks_dashboard_admin : navLinks_dashboard_user, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, showNames, isAdmin, bookingTypes, });
+        }
     }else{
-        res.render("user/dashboard",{navLinks: navLinks_dashboard, bookings, championship, bColor, chColor, clColor, closure, bookingsForTable, bookingTypes, });
+        res.redirect("/");
     }
 }
 
 // USER MANAGEMENT
 
 showUserManagement = async (req,res) => {
-    const user = await getUsers();
-    res.render("user/usermanagement", {user,navLinks: navLinks_userManagement});
+    if(req.session.user.role == 'admin'){
+        const user = await getUsers();
+        res.render("user/usermanagement", {user,navLinks: navLinks_userManagement});
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 showAddUser = (req,res) => {
-    if(req.query.msg){
-        res.render("user/addUser", {msg: req.query.msg, headline: 'Neuen Benutzer erstellen', btnTxt: 'Benutzer hinzufügen', action: '/user/usermanagement/add', navLinks: navLinks_userManagement});
+    if(req.session.user.role == 'admin'){
+        if(req.query.msg){
+            res.render("user/addUser", {msg: req.query.msg, headline: 'Neuen Benutzer erstellen', btnTxt: 'Benutzer hinzufügen', action: '/user/usermanagement/add', navLinks: navLinks_userManagement});
+        }else{
+            res.render("user/addUser", {headline: 'Neuen Benutzer erstellen', btnTxt: 'Benutzer hinzufügen', action: '/user/usermanagement/add', navLinks: navLinks_userManagement});
+        }
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
     }else{
-        res.render("user/addUser", {headline: 'Neuen Benutzer erstellen', btnTxt: 'Benutzer hinzufügen', action: '/user/usermanagement/add', navLinks: navLinks_userManagement});
+        res.redirect("/");
     }
 }
 
 handleAddUser = async(req,res) => {
-    const {gender, role, firstname, lastname, email, password, street, houseNumber, zip, city} = req.body;
-    if(firstname.trim() != "" && lastname.trim() != "" && email.trim() != "" && password != "" && street != "" && houseNumber != "" && zip != "" && city != ""){
-        const pwdHash = await bcrypt.hash(password,10);
-        const data = {
-            gender: gender,
-            role: role,
-            firstname: firstname,
-            lastname: lastname,
-            email: email,
-            password: pwdHash,
-            street: street,
-            houseNumber: houseNumber,
-            zip: zip,
-            city: city
-        }
-        await addUser(data);
-        res.redirect("/user/usermanagement");
-    }else{
-        res.redirect("/user/usermanagement/add?msg=Füllen Sie die Daten bitte vollständig aus!");
-    }
-
-}
-
-showEditUser = async(req,res) => {
-    const userID = req.params.id;
-    const user = await getUser(userID);
-    
-    if(req.query.msg){
-        res.render("user/addUser", {msg: req.query.msg, headline: "Benutzer bearbeiten", isEdit: true, user, btnTxt: 'Speichern', action: '/user/usermanagement/edit', navLinks: navLinks_userManagement});
-    }else{
-        res.render("user/addUser", {headline: "Benutzer bearbeiten", isEdit: true, user, btnTxt: 'Speichern', action: '/user/usermanagement/edit', navLinks: navLinks_userManagement});
-    }
-}
-
-handleEditUser = async(req,res) => {
-    try{
-        const {userID, gender, role, firstname, lastname, email, street, houseNumber, zip, city} = req.body;
-        if(userID.trim() != "" && gender.trim() != "" && role.trim() != "" && firstname.trim() != "" && lastname.trim() != "" && email.trim() != "" && street.trim() != "" && houseNumber.trim() != "" && zip.trim() != "" && city.trim() != ""){
+    if(req.session.user.role == 'admin'){
+        const {gender, role, firstname, lastname, username, password, street, houseNumber, zip, city} = req.body;
+        if(firstname.trim() != "" && lastname.trim() != "" && username.trim() != "" && password != "" && street != "" && houseNumber != "" && zip != "" && city != ""){
+            const pwdHash = await bcrypt.hash(password,10);
             const data = {
-                userID: userID,
                 gender: gender,
                 role: role,
                 firstname: firstname,
                 lastname: lastname,
-                email: email,
+                username: username,
+                password: pwdHash,
                 street: street,
                 houseNumber: houseNumber,
                 zip: zip,
                 city: city
             }
-            await updateUser(data);
+            await addUser(data);
             res.redirect("/user/usermanagement");
         }else{
-            res.redirect("/user/usermanagement/edit/"+userID+"?msg=Füllen Sie die Daten bitte vollständig aus!");
+            res.redirect("/user/usermanagement/add?msg=Füllen Sie die Daten bitte vollständig aus!");
         }
-    }catch(err){
-        console.log(err);
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
+
+}
+
+showEditUser = async(req,res) => {
+    if(req.session.user.role == 'admin'){
+        const userID = req.params.id;
+        const user = await getUser(userID);
+        
+        if(req.query.msg){
+            res.render("user/addUser", {msg: req.query.msg, headline: "Benutzer bearbeiten", isEdit: true, user, btnTxt: 'Speichern', action: '/user/usermanagement/edit', navLinks: navLinks_userManagement});
+        }else{
+            res.render("user/addUser", {headline: "Benutzer bearbeiten", isEdit: true, user, btnTxt: 'Speichern', action: '/user/usermanagement/edit', navLinks: navLinks_userManagement});
+        }
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
+}
+
+handleEditUser = async(req,res) => {
+    if(req.session.user.role == 'admin'){
+        try{
+            const {userID, gender, role, firstname, lastname, username, street, houseNumber, zip, city} = req.body;
+            if(userID.trim() != "" && gender.trim() != "" && role.trim() != "" && firstname.trim() != "" && lastname.trim() != "" && username.trim() != "" && street.trim() != "" && houseNumber.trim() != "" && zip.trim() != "" && city.trim() != ""){
+                const data = {
+                    userID: userID,
+                    gender: gender,
+                    role: role,
+                    firstname: firstname,
+                    lastname: lastname,
+                    username: username,
+                    street: street,
+                    houseNumber: houseNumber,
+                    zip: zip,
+                    city: city
+                }
+                await updateUser(data);
+                res.redirect("/user/usermanagement");
+            }else{
+                res.redirect("/user/usermanagement/edit/"+userID+"?msg=Füllen Sie die Daten bitte vollständig aus!");
+            }
+        }catch(err){
+            console.log(err);
+        }
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
     }
 }
 
 showDeleteUser = async(req,res) => {
-    const id = req.params.id;
-    const user = await getUser(id);
-    res.render("user/deleteUser", {user, navLinks_userManagement});
+    if(req.session.user.role == 'admin'){
+        const id = req.params.id;
+        const user = await getUser(id);
+        res.render("user/deleteUser", {user, navLinks_userManagement});
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 handleDeleteUser = async(req,res) => {
-    const {userID} = req.body;
-    await deleteUser(userID);
-    res.redirect("/user/usermanagement");
+    if(req.session.user.role == 'admin'){
+        const {userID} = req.body;
+        await deleteUser(userID);
+        res.redirect("/user/usermanagement");
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 // COURT MANAGEMENT
 
 showCourtManagement = async(req,res) => {
-    const bookingTypes = await getBookingTypes();
-    const activitys = await getActivitys();
-    res.render("user/courtmanagement", {navLinks: navLinks_courtManagement, bookingTypes, activitys});
+    if(req.session.user.role == 'admin'){
+        const bookingTypes = await getBookingTypes();
+        const activitys = await getActivitys();
+        res.render("user/courtmanagement", {navLinks: navLinks_courtManagement, bookingTypes, activitys});
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 handleChangeBookingType = async(req,res) => {
-    const translation = {
-        Reservierung: "reservation",
-        Meisterschaft: "championship",
-        Gesperrt: "closed"
-    }
-    const {hexCode, title} = req.body;
-    if(hexCode.startsWith('#') && (hexCode.length >= 4 && hexCode.length <= 7)){
-        const data = {
-            title: translation[title],
-            hexCode: hexCode
+    if(req.session.user.role == 'admin'){
+        const translation = {
+            Reservierung: "reservation",
+            Meisterschaft: "championship",
+            Gesperrt: "closed"
         }
-        await updateBookingType(data);
-        res.redirect("/user/courtmanagement");
+        const {hexCode, title} = req.body;
+        if(hexCode.startsWith('#') && (hexCode.length >= 4 && hexCode.length <= 7)){
+            const data = {
+                title: translation[title],
+                hexCode: hexCode
+            }
+            await updateBookingType(data);
+            res.redirect("/user/courtmanagement");
+        }else{
+            res.redirect("/user/courtmanagement?msg=Bitte geben Sie einen gültigen HEX-Code ein!");
+        }
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
     }else{
-        res.redirect("/user/courtmanagement?msg=Bitte geben Sie einen gültigen HEX-Code ein!");
+        res.redirect("/");
     }
 }
 
 showActivity = async(req,res) => {
-    const user = await getUsers();
-    if(req.params.id){
-        const activity = await getActivity(req.params.id);
-        res.render("user/addActivity", {navLinks: navLinks_courtManagement, user, activity});
+    if(req.session.user.role == 'admin'){
+        const user = await getUsers();
+        if(req.params.id){
+            const activity = await getActivity(req.params.id);
+            console.log(activity);
+            res.render("user/addActivity", {navLinks: navLinks_courtManagement, user, activity});
+        }else{
+            res.render("user/addActivity", {navLinks: navLinks_courtManagement, user});
+        }
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
     }else{
-        res.render("user/addActivity", {navLinks: navLinks_courtManagement, user});
+        res.redirect("/");
     }
 }
 
 handleAddActivity = async(req,res) => {
-    const {title, time, date, users, activityID} = req.body;
-    let txt = users.split(";");
-    let list = [];
-    for(let i = 0; i < txt.length; i++){
-        list.push(txt[i]);
-    }
-    console.log(activityID);
-    if(activityID.trim() != "" && activityID != undefined){
-        const data = {
-            activityID: activityID,
-            title: title,
-            time: time,
-            date: date,
-            users: list
+    if(req.session.user.role == 'admin'){
+        const {title, time, date, users, activityID} = req.body;
+        let txt = users.split(";");
+        let list = [];
+        for(let i = 0; i < txt.length; i++){
+            list.push(txt[i]);
         }
-        await updateActivity(data);
-    }else{ 
-        const data = {
-            title: title,
-            time: time,
-            date: date,
-            users: list
+        console.log(activityID);
+        if(activityID.trim() != "" && activityID != undefined){
+            const data = {
+                activityID: activityID,
+                title: title,
+                time: time,
+                date: date,
+                users: list
+            }
+            await updateActivity(data);
+        }else{ 
+            const data = {
+                title: title,
+                time: time,
+                date: date,
+                users: list
+            }
+            await addActivity(data);
         }
-        await addActivity(data);
+        res.redirect("/user/courtmanagement");
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
     }
-    res.redirect("/user/courtmanagement");
 }
 
 showActivityDownload = async(req,res) => {
-    const year = req.params.year;
-    const workbook = await createActivityWorkbook(year,7);
-      res.setHeader(
-        'Content-Type',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    );
-    res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="Aktivitäten_${year}.xlsx"`
-    );
-    await workbook.xlsx.write(res);
-    res.end();
+    if(req.session.user.role == 'admin'){
+        const year = req.params.year;
+        const workbook = await createActivityWorkbook(year,7);
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader(
+            'Content-Disposition',
+            `attachment; filename="Aktivitäten_${year}.xlsx"`
+        );
+        await workbook.xlsx.write(res);
+        res.end();
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 showMembershipDownload = async(req,res) => {
-    const year = req.params.year;
-    const workbook = await createMembershipWorkbook(year, 7, 105, 15);
-      res.setHeader(
-        'Content-Type',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    );
-    res.setHeader(
-        'Content-Disposition',
-        `attachment; filename="Mitgliedsbeitrag_${year}.xlsx"`
-    );
-    await workbook.xlsx.write(res);
-    res.end();
+    if(req.session.user.role == 'admin'){
+        const year = req.params.year;
+        const workbook = await createMembershipWorkbook(year, 7, 105, 15);
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader(
+            'Content-Disposition',
+            `attachment; filename="Mitgliedsbeitrag_${year}.xlsx"`
+        );
+        await workbook.xlsx.write(res);
+        res.end();
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 // BOOKING MANAGEMENT
 
 showAbo = async(req,res) => {
-    const users = await getUsersUserIdAndName();
-    const courts = await getCourts();
-    res.render("user/abo",{navLinks: navLinks_booking, users, courts});
+    if(req.session.user.role == 'admin'){
+        const users = await getUsersUserIdAndName();
+        const courts = await getCourts();
+        res.render("user/abo",{navLinks: navLinks_booking, users, courts});
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 handleAbo = async(req,res) => {
-    const { startMonth, endMonth, weekday, from, to, court, members} = req.body;
-    if(
-        (startMonth.trim() != "" && startMonth.trim() != null) && 
-        (endMonth.trim() != "" && endMonth.trim() != null) &&
-        (weekday.trim() != "" && weekday.trim() != null) &&
-        (from.trim() != "" && from.trim() != null) &&
-        (to.trim() != "" && to.trim() != null) &&
-        (court.trim() != "" && court.trim() != null) &&
-        (members.trim() != "" && members.trim() != null)
-    ){
-        const membersArr = [];
-        let split = members.split("/");
-        for(let i = 0; i < split.length; i++){
-            let splitSemiko = split[i].split(";");
-            membersArr.push({
-                id: splitSemiko[0],
-                status: splitSemiko[1]
-            })
+    if(req.session.user.role == 'admin'){
+        const { startMonth, endMonth, weekday, from, to, court, members} = req.body;
+        if(
+            (startMonth.trim() != "" && startMonth.trim() != null) && 
+            (endMonth.trim() != "" && endMonth.trim() != null) &&
+            (weekday.trim() != "" && weekday.trim() != null) &&
+            (from.trim() != "" && from.trim() != null) &&
+            (to.trim() != "" && to.trim() != null) &&
+            (court.trim() != "" && court.trim() != null) &&
+            (members.trim() != "" && members.trim() != null)
+        ){
+            const membersArr = [];
+            let split = members.split("/");
+            for(let i = 0; i < split.length; i++){
+                let splitSemiko = split[i].split(";");
+                membersArr.push({
+                    id: splitSemiko[0],
+                    status: splitSemiko[1]
+                })
+            }
+            let data = {
+                firstDay: formatSQLDate(getFirstDayOfMonth(weekday,startMonth)),
+                lastDay: formatSQLDate(getFirstDayOfMonth(weekday,parseInt(endMonth)+1)),
+                from,
+                to,
+                court,
+                members: membersArr,
+            };
+            await addAbo(data);
+            res.redirect("/user/abo");
+        }else{
+            res.redirect("/user/abo");
         }
-        let data = {
-            firstDay: formatSQLDate(getFirstDayOfMonth(weekday,startMonth)),
-            lastDay: formatSQLDate(getFirstDayOfMonth(weekday,parseInt(endMonth)+1)),
-            from,
-            to,
-            court,
-            members: membersArr,
-        };
-        console.log("LETS GOOOO!");
-        await addAbo(data);
-        res.redirect("/user/abo");
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
     }else{
-        res.redirect("/user/abo");
+        res.redirect("/");
     }
 }
 
 showAbonnements = async(req,res) =>{
-    const abos = await getAbos();
-    res.render("user/abonnements", {navLinks_booking, abos});
+    if(req.session.user.role == 'admin'){
+        const abos = await getAbos();
+        res.render("user/abonnements", {navLinks_booking, abos});
+    }else if(req.session.user != null && req.session.user != undefined){
+        res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
+    }
 }
 
 showDeleteAbo = async(req,res) => {
@@ -365,8 +480,10 @@ showDeleteAbo = async(req,res) => {
         const noteID = req.params.id;
         await deleteAbo(noteID);
         res.redirect("/user/abonnements");
-    }else{
+    }else if(req.session.user != null && req.session.user != undefined){
         res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
     }
 }
 
@@ -412,8 +529,10 @@ handleChampionship = async(req,res) => {
         }else{
             res.redirect("/user?err=Bitte gültiges Datum auswählen!");
         }
-    }else{
+    }else if(req.session.user != null && req.session.user != undefined) {
         res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
     }
     
 }
@@ -428,8 +547,10 @@ handleDeleteChampionship = async(req,res) => {
         const {date} = req.body;
         await deleteChampionship(formatDateToISO(date));
         res.redirect("/user?succ=Meisterschaftstermin entfernt!");
-    }else{
+    }else if(req.session.user != null && req.session.user != undefined) {
         res.redirect("/user?err=Zugriff verweigert!");
+    }else{
+        res.redirect("/");
     }
 }
 

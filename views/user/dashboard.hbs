@@ -12,9 +12,11 @@
             </div>
         {{/if}}
         <div class="mt-5">
+            {{#if isAdmin}}
             <button type="button" class="bg-cyan-600 text-white py-3 px-5 rounded w-full cursor-pointer" onclick="window.location.href='/user/abonnements'" >
                 Abonnements
             </button>
+            {{/if}}
             <button type="button" class="bg-cyan-600 text-white py-3 px-5 rounded w-full cursor-pointer mt-2" onclick="window.location.href='/user/booking'" >
                 + Neue Reservierung
             </button>
@@ -64,7 +66,7 @@
                         {{this.date}} · {{this.starttime}} - {{this.endtime}} Uhr
                     </p>
                 </div>
-                <div class="p-2 rounded-lg flex items-center justify-center" style="background-color: {{../bColor}};" onclick="openDeleteDialog('{{this.bookingID}}','{{formatDate this.date}}', '{{this.starttime}}', '{{this.endtime}}', '/user/booking/delete/')">
+                <div class="p-2 rounded-lg flex items-center justify-center" style="background-color: {{../bColor}};" onclick="openDeleteDialog('{{this.bookingID}}','{{this.date}}', '{{this.starttime}}', '{{this.endtime}}', '/user/booking/delete/')">
                     <img src="/media/svg/trash.svg" class="w-5 h-5" />
                 </div>
             </div>
@@ -80,6 +82,7 @@
         <div class="grid gap-1 lg:grid-cols-2 w-[93%] mx-auto">
 
             <!-- MEISTERSCHAFT -->
+            {{#if isAdmin}}
 
             <div class="mx-auto p-6 w-full">
                 <div class="bg-white shadow-lg rounded-2xl p-6 border border-gray-200 h-full">
@@ -301,6 +304,7 @@
                 {{/if}}
                 </div>
             </div>
+            {{/if}}
                 
         </div>
         {{> courtTable bookingTypes=bookingTypes bookings=bookingsForTable}}
@@ -358,11 +362,10 @@
 
 <script>
     const dialog = document.getElementById('deleteConfirmDialog');
-    setTodaysValuesInInput();
-    evChampionship();
 
     // Öffnen des Delete Dialogs
     function openDeleteDialog(bookingID, date, from, to, action) {
+        console.log(date);
         dialog.showModal();
         document.getElementById('dialogDate').innerHTML = date;
         document.getElementById('dialogFrom').innerHTML = from;
@@ -384,29 +387,34 @@
         console.log('Löschen bestätigt');
         }
     });
+    
+    if({{{json isAdmin}}}){
+        setTodaysValuesInInput();
+        function setTodaysValuesInInput(){
+            const formatSQL = (d) => {
+                const dd = String(d.getDate()).padStart(2, "0");
+                const mm = String(d.getMonth() + 1).padStart(2, "0");
+                const yy = d.getFullYear();
+                return `${yy}-${mm}-${dd}`;
+            }
 
-    function setTodaysValuesInInput(){
-        const formatSQL = (d) => {
-            const dd = String(d.getDate()).padStart(2, "0");
-            const mm = String(d.getMonth() + 1).padStart(2, "0");
-            const yy = d.getFullYear();
-            return `${yy}-${mm}-${dd}`;
+            const cFrom = document.querySelector("#championshipFrom");
+            const cTo = document.querySelector("#championshipTo");
+            const xFrom = document.querySelector("#closureFrom");
+            const xTo = document.querySelector("#closureTo");
+            const cDate = document.querySelector('#championshipDate');
+            const aclDate = document.querySelector('#activeClosureDate');
+            
+            cFrom.value = "09:00";
+            cTo.value = "16:00";
+            cDate.value = formatSQL(getFirstSundayInMayOrAugust());
+            xFrom.value = formatSQL(new Date()) + " 06:00:00";
+            xTo.value = formatSQL(new Date()) + " 22:00:00";
+            if(aclDate != undefined){
+                aclDate.value = formatSQL(new Date()) +" "+ formatTime(new Date());
+            }
+            
         }
-
-        const cFrom = document.querySelector("#championshipFrom");
-        const cTo = document.querySelector("#championshipTo");
-        const xFrom = document.querySelector("#closureFrom");
-        const xTo = document.querySelector("#closureTo");
-        const cDate = document.querySelector('#championshipDate');
-        const aclDate = document.querySelector('#activeClosureDate');
-        
-        cFrom.value = "09:00";
-        cTo.value = "16:00";
-        cDate.value = formatSQL(getFirstSundayInMayOrAugust());
-        xFrom.value = formatSQL(new Date()) + " 06:00:00";
-        xTo.value = formatSQL(new Date()) + " 22:00:00";
-        aclDate.value = formatSQL(new Date()) +" "+ formatTime(new Date());
-        
     }
 
     function getFirstSundayInMayOrAugust() {
@@ -456,15 +464,18 @@
         return `${hh}:${mm}:00`;
     }
 
-    function evChampionship(){
-        const from = document.getElementById('championshipFrom');
-        const to = document.getElementById('championshipTo');
-        from.addEventListener('input', (event) => {
-            event.target.value = handleInput(event.target.value);
-        })
-        to.addEventListener('input', (event) => {
-            event.target.value = handleInput(event.target.value);
-        })
+    if({{{json isAdmin}}}){
+        evChampionship();
+        function evChampionship(){
+            const from = document.getElementById('championshipFrom');
+            const to = document.getElementById('championshipTo');
+            from.addEventListener('input', (event) => {
+                event.target.value = handleInput(event.target.value);
+            })
+            to.addEventListener('input', (event) => {
+                event.target.value = handleInput(event.target.value);
+            })
+        }
     }
 
     function handleInput(input){

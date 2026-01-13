@@ -15,7 +15,7 @@ async function getUsers(){
                 gender: rows[i].gender,
                 firstname: rows[i].firstname,
                 lastname: rows[i].lastname,
-                email: rows[i].email,
+                username: rows[i].username,
                 street: rows[i].street,
                 houseNumber: rows[i].houseNumber,
                 zip: rows[i].zip,
@@ -50,7 +50,7 @@ async function getUser(userID){
             role: await getRoleTitleByRoleId(rows[0].roleRoleID),
             firstname: rows[0].firstname,
             lastname: rows[0].lastname,
-            email: rows[0].email,
+            username: rows[0].username,
             street: rows[0].street,
             houseNumber: rows[0].houseNumber,
             zip: rows[0].zip,
@@ -96,8 +96,8 @@ async function addUser(user){
     try{
         const uuid = await getUUID();
         const roleID = await getRoleIdByTitle(user.role);
-        const sql = "INSERT INTO user (userID, firstname, lastname, email, password, street, houseNumber, zip, city, roleRoleID, gender) VALUE (?,?,?,?,?,?,?,?,?,?,?)";
-        await mysql.pool.query(sql, [`${uuid}`, user.firstname, user.lastname, user.email, user.password, user.street, user.houseNumber, user.zip, user.city, roleID, user.gender]);
+        const sql = "INSERT INTO user (userID, firstname, lastname, username, password, street, houseNumber, zip, city, roleRoleID, gender) VALUE (?,?,?,?,?,?,?,?,?,?,?)";
+        await mysql.pool.query(sql, [`${uuid}`, user.firstname, user.lastname, user.username, user.password, user.street, user.houseNumber, user.zip, user.city, roleID, user.gender]);
     }catch(err){
         console.log(err);
     }
@@ -106,8 +106,8 @@ async function addUser(user){
 async function updateUser(user){
     try{
         const roleID = await getRoleIdByTitle(user.role);
-        const sql = "UPDATE user SET firstname = ?, lastname = ?, email = ?, street = ?, houseNumber = ?, zip = ?, city = ?, roleRoleID = ?, gender = ? WHERE userID = ?";
-        await mysql.pool.query(sql, [user.firstname, user.lastname, user.email, user.street, user.houseNumber, user.zip, user.city, roleID, user.gender, user.userID]);
+        const sql = "UPDATE user SET firstname = ?, lastname = ?, username = ?, street = ?, houseNumber = ?, zip = ?, city = ?, roleRoleID = ?, gender = ? WHERE userID = ?";
+        await mysql.pool.query(sql, [user.firstname, user.lastname, user.username, user.street, user.houseNumber, user.zip, user.city, roleID, user.gender, user.userID]);
     }catch(err){
         console.log(err);
     }
@@ -602,8 +602,8 @@ async function updateClosure(noteID, enddatetime, userID){
 
 async function getAllBookingsBetween(startdate, enddate){
     try{
-        const sql = "SELECT booking.*, booking_user.*, DATE_FORMAT(booking.date, '%Y-%m-%d') AS date FROM booking JOIN booking_user ON bookingID = bookingBookingID WHERE date >= ? AND date <= ?";
-        const [rows] = await mysql.pool.query(sql, [startdate, enddate]);
+        const sql = "SELECT user.firstname, user.lastname, booking.*, booking_user.*, DATE_FORMAT(booking.date, '%Y-%m-%d') AS date FROM booking JOIN booking_user ON bookingID = bookingBookingID JOIN user ON booking_user.userUserID = userID WHERE date >= ? AND date <= ?";
+        const [rows] = await mysql.pool.query(sql, [startdate, enddate]); 
         return rows;
     }catch(err){
         console.log(err);

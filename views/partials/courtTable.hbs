@@ -1,94 +1,111 @@
 <div class="w-full max-w-[93%] mx-auto overflow-x-auto py-5">
   <!-- AUSWAHLEN -->
-  <div class="w-max flex mx-auto lg:ml-auto lg:mr-0 py-3">
-    <!-- KW auswählen -->
-    <div class="w-max text-white px-3" id="choose-kw-drp">
-      <div id="kw-button" class="bg-gray-900 flex items-center px-5 py-3 cursor-pointer">
-        <span id="kw-button-text"></span>
-        <img src="/media/svg/arrowhead_down.svg" class="h-[30px]" />
+  <div class="flex w-max lg:w-full mx-auto">
+    <div class="lg:flex">
+      <div class='flex items-center mr-4'>
+        <div class="w-[20px] h-[20px] mr-3" style="background-color: yellow;" id="colorReservation"></div>
+        <p>reserviert</p>
       </div>
-      <div id="kw-choose" class="bg-gray-900 border-t border-white px-5 py-3 hidden">
+      <div class='flex items-center mr-4'>
+        <div class="w-[20px] h-[20px] mr-3" style="background-color: yellow;" id="colorClosure"></div>
+        <p>gesperrt</p>
+      </div>
+      <div class='flex items-center mr-4'>
+        <div class="w-[20px] h-[20px] mr-3" style="background-color: yellow;" id="colorChampionship"></div>
+        <p>Meisterschaft</p>
       </div>
     </div>
-    <!-- Ansicht auswählen -->
-    <div class="w-max text-white pl-3">
-      <div id="view-button" class="bg-gray-900 flex items-center px-5 py-3 cursor-pointer">
-        <span id="view-button-text"></span>
-        <img src="/media/svg/arrowhead_down.svg" class="h-[30px]" />
+    <div class="w-max flex mx-auto lg:ml-auto lg:mr-0 py-3">
+      <!-- KW auswählen -->
+      <div class="w-max text-white px-3" id="choose-kw-drp">
+        <div id="kw-button" class="bg-gray-900 flex items-center px-5 py-3 cursor-pointer">
+          <span id="kw-button-text"></span>
+          <img src="/media/svg/arrowhead_down.svg" class="h-[30px]" />
+        </div>
+        <div id="kw-choose" class="bg-gray-900 border-t border-white px-5 py-3 hidden">
+        </div>
       </div>
-      <div id="view-choose" class="bg-gray-900 border-t border-white px-5 py-3 hidden">
+      <!-- Ansicht auswählen -->
+      <div class="w-max text-white pl-3">
+        <div id="view-button" class="bg-gray-900 flex items-center px-5 py-3 cursor-pointer">
+          <span id="view-button-text"></span>
+          <img src="/media/svg/arrowhead_down.svg" class="h-[30px]" />
+        </div>
+        <div id="view-choose" class="bg-gray-900 border-t border-white px-5 py-3 hidden">
+        </div>
       </div>
     </div>
   </div>
-
+  <div>
   <!-- WEEK VIEW -->
-  <table class="w-full border-collapse border border-gray-300 text-center text-sm overflow-x-auto" id="weekTable">
-    <thead>
-      <!-- Zeile 1: Wochentage -->
-      <tr class="bg-gray-100">
-        <th rowspan="3" class="border border-gray-300 p-2 w-20">Zeit</th>
-        <th colspan="2" class="border border-gray-300 p-2">
-          <span class="hidden xl:inline">Montag</span>
-          <span class="inline xl:hidden">Mo</span>
-        </th>
-        <th colspan="2" class="border border-gray-300 p-2">
-          <span class="hidden xl:inline">Dienstag</span>
-          <span class="inline xl:hidden">Di</span>
-        </th>
-        <th colspan="2" class="border border-gray-300 p-2">
-          <span class="hidden xl:inline">Mittwoch</span>
-          <span class="inline xl:hidden">Mi</span>
-        </th>
-        <th colspan="2" class="border border-gray-300 p-2">
-          <span class="hidden xl:inline">Donnerstag</span>
-          <span class="inline xl:hidden">Do</span>
-        </th>
-        <th colspan="2" class="border border-gray-300 p-2">
-          <span class="hidden xl:inline">Freitag</span>
-          <span class="inline xl:hidden">Fr</span>
-        </th>
-        <th colspan="2" class="border border-gray-300 p-2">
-          <span class="hidden xl:inline">Samstag</span>
-          <span class="inline xl:hidden">Sa</span>
-        </th>
-        <th colspan="2" class="border border-gray-300 p-2">
-          <span class="hidden xl:inline">Sonntag</span>
-          <span class="inline xl:hidden">So</span>
-        </th>
-      </tr>
+    <table class="w-full border-collapse border border-gray-300 text-center text-sm overflow-x-auto" id="weekTable">
+      <thead>
+        <!-- Zeile 1: Wochentage -->
+        <tr class="bg-gray-100">
+          <th rowspan="3" class="border border-gray-300 p-2 w-20">Zeit</th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span class="hidden xl:inline">Montag</span>
+            <span class="inline xl:hidden">Mo</span>
+          </th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span class="hidden xl:inline">Dienstag</span>
+            <span class="inline xl:hidden">Di</span>
+          </th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span class="hidden xl:inline">Mittwoch</span>
+            <span class="inline xl:hidden">Mi</span>
+          </th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span class="hidden xl:inline">Donnerstag</span>
+            <span class="inline xl:hidden">Do</span>
+          </th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span class="hidden xl:inline">Freitag</span>
+            <span class="inline xl:hidden">Fr</span>
+          </th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span class="hidden xl:inline">Samstag</span>
+            <span class="inline xl:hidden">Sa</span>
+          </th>
+          <th colspan="2" class="border border-gray-300 p-2">
+            <span class="hidden xl:inline">Sonntag</span>
+            <span class="inline xl:hidden">So</span>
+          </th>
+        </tr>
 
-      <!-- Zeile 2: Datum -->
-      <tr class="bg-gray-100 dates-row">
-        <th colspan="2" class="border border-gray-300 p-2"></th>
-        <th colspan="2" class="border border-gray-300 p-2"></th>
-        <th colspan="2" class="border border-gray-300 p-2"></th>
-        <th colspan="2" class="border border-gray-300 p-2"></th>
-        <th colspan="2" class="border border-gray-300 p-2"></th>
-        <th colspan="2" class="border border-gray-300 p-2"></th>
-        <th colspan="2" class="border border-gray-300 p-2"></th>
-      </tr>
+        <!-- Zeile 2: Datum -->
+        <tr class="bg-gray-100 dates-row">
+          <th colspan="2" class="border border-gray-300 p-2"></th>
+          <th colspan="2" class="border border-gray-300 p-2"></th>
+          <th colspan="2" class="border border-gray-300 p-2"></th>
+          <th colspan="2" class="border border-gray-300 p-2"></th>
+          <th colspan="2" class="border border-gray-300 p-2"></th>
+          <th colspan="2" class="border border-gray-300 p-2"></th>
+          <th colspan="2" class="border border-gray-300 p-2"></th>
+        </tr>
 
-      <!-- Zeile 3: Platz 1 / Platz 2 -->
-      <tr class="bg-gray-100">
-        <th class="border border-gray-300 p-2">Platz 1</th>
-        <th class="border border-gray-300 p-2">Platz 2</th>
-        <th class="border border-gray-300 p-2">Platz 1</th>
-        <th class="border border-gray-300 p-2">Platz 2</th>
-        <th class="border border-gray-300 p-2">Platz 1</th>
-        <th class="border border-gray-300 p-2">Platz 2</th>
-        <th class="border border-gray-300 p-2">Platz 1</th>
-        <th class="border border-gray-300 p-2">Platz 2</th>
-        <th class="border border-gray-300 p-2">Platz 1</th>
-        <th class="border border-gray-300 p-2">Platz 2</th>
-        <th class="border border-gray-300 p-2">Platz 1</th>
-        <th class="border border-gray-300 p-2">Platz 2</th>
-        <th class="border border-gray-300 p-2">Platz 1</th>
-        <th class="border border-gray-300 p-2">Platz 2</th>
-      </tr>
-    </thead>
+        <!-- Zeile 3: Platz 1 / Platz 2 -->
+        <tr class="bg-gray-100">
+          <th class="border border-gray-300 p-2">Platz 1</th>
+          <th class="border border-gray-300 p-2">Platz 2</th>
+          <th class="border border-gray-300 p-2">Platz 1</th>
+          <th class="border border-gray-300 p-2">Platz 2</th>
+          <th class="border border-gray-300 p-2">Platz 1</th>
+          <th class="border border-gray-300 p-2">Platz 2</th>
+          <th class="border border-gray-300 p-2">Platz 1</th>
+          <th class="border border-gray-300 p-2">Platz 2</th>
+          <th class="border border-gray-300 p-2">Platz 1</th>
+          <th class="border border-gray-300 p-2">Platz 2</th>
+          <th class="border border-gray-300 p-2">Platz 1</th>
+          <th class="border border-gray-300 p-2">Platz 2</th>
+          <th class="border border-gray-300 p-2">Platz 1</th>
+          <th class="border border-gray-300 p-2">Platz 2</th>
+        </tr>
+      </thead>
 
-    <tbody id="timeTableBody"></tbody>
-  </table>
+      <tbody id="timeTableBody"></tbody>
+    </table>
+  </div>
   <!-- DAY VIEW -->
   <div id="dayTable" class="hidden">
     <table class="w-full border-collapse border border-gray-300 text-center text-sm w-max mx-auto">
@@ -116,6 +133,7 @@
 </div>
 
 <script>
+  setColors();
   fillKWToDropdown();
   fillViewDropdown();
   createWeekTable();
@@ -200,6 +218,35 @@
     }
   }
 
+  function recreateTbody(){
+    const tbody = document.getElementById("timeTableBody");
+
+    for (let stunde = 7; stunde <= 22; stunde++) {
+      // Erste Zeile der Stunde
+      const tr1 = document.createElement("tr");
+      const tr2 = document.createElement("tr");
+
+      // Zeit-Zelle links mit rowspan=2
+      let zeitCell = document.createElement("td");
+      zeitCell.rowSpan = "2";
+      zeitCell.className = "border-r border-l border-t border-gray-300 p-2 font-medium bg-gray-50";
+      zeitCell.textContent = `${String(stunde-1).padStart(2, "0")}:00`;
+      tr1.appendChild(zeitCell);
+
+      // 14 Platz-Zellen für Platz 1 & 2 für 7 Tage
+      for (let i = 0; i < 14; i++) {
+        let td = document.createElement("td");
+        td.className = "border border-gray-300 p-2 h-6";
+        tr1.appendChild(td);
+        td = document.createElement("td");
+        td.className = "border border-gray-300 p-2 h-6";
+        tr2.appendChild(td);
+      }
+      tbody.appendChild(tr1);
+      tbody.appendChild(tr2);
+    }
+  }
+
   function changeDatesAtWeekTable(week){
     const ersterTag = getMondayOfWeek(week);
     const dateCells = document.querySelectorAll(".dates-row th");
@@ -251,6 +298,7 @@
       const date = new Date(input.value);
       document.getElementById('dayView-weekday').innerText = weekdays[date.getDay()];
       clearTbodyDayView();
+      recreateDayView();
       fillDataDayView(date);
     })
   }
@@ -271,6 +319,7 @@
     for (let stunde = 7; stunde <= 22; stunde++) {
       // Erste Zeile der Stunde
       const tr1 = document.createElement("tr");
+      tr1.classList.add('h-6');
 
       // Zeit-Zelle links mit rowspan=2
       let zeitCell = document.createElement("td");
@@ -281,6 +330,7 @@
 
       // 14 Platz-Zellen für Platz 1 & 2 für 7 Tage
       const tr2 = document.createElement('tr');
+      tr2.classList.add('h-6');
       for (let i = 0; i < 2; i++) {
         let td = document.createElement("td");
         td.className = "border border-gray-300 p-2 h-6";
@@ -392,6 +442,7 @@
         btn.innerHTML = event.target.innerHTML;
         changeDatesAtWeekTable(parseInt(event.target.innerHTML.replace("KW", "").trim()));
         await clearTbody();
+        recreateTbody();
         await fillData(event.target.innerHTML.replace("KW", "").trim());
       });
     }
@@ -420,166 +471,181 @@
     return 2 + Math.floor(diff);
   }
 
-  function fillData(kw){
+function fillData(kw) {
     const bookingTypes = {{{json @root.bookingTypes}}};
-    let closureColor = '#ff0000';
-    for(let i = 0; i < bookingTypes.length; i++){
-      if(bookingTypes[i].title == 'closed'){
-        closureColor = bookingTypes[i].hexCode;
-        break;
-      }
-    }
     const bookings = {{{json bookingsForTable}}};
+    const showNames = {{{json showNames}}};
     const tr = document.getElementById('timeTableBody').children;
-    let startdate = getMondayAndSundayOfKW(kw).monday;
-    let enddate = getMondayAndSundayOfKW(kw).sunday;
-    for(let i = 0; i < bookings.length; i++){
-      let x = 0;
-      let y = 0;
-      if(new Date(bookings[i].date.split("T")[0]) <= enddate && new Date(bookings[i].date.split("T")[0]) >= startdate){
-        let startHH = parseInt(bookings[i].starttime.split(":")[0]);
-        let startMM = parseInt(bookings[i].starttime.split(":")[1]);
-        let endHH = parseInt(bookings[i].endtime.split(":")[0]);
-        let endMM = parseInt(bookings[i].endtime.split(":")[1]);
-        x = 1 + getWeekdayFromDate(bookings[i].date)*2;
-        x = (bookings[i].courtCourtID == 2)? ++x : x;
-        y = (parseInt(bookings[i].starttime.split(":")[0]) - 6) * 2;
-        y = (parseInt(bookings[i].starttime.split(":")[1]) == 30)? ++y : y;
+    const { monday: startdate, sunday: enddate } = getMondayAndSundayOfKW(kw);
+
+    for (let i = 0; i < bookings.length; i++) {
+        const bookingDate = new Date(bookings[i].date.split("T")[0]);
+        if (bookingDate < startdate || bookingDate > enddate) continue;
+
+        const [startHH, startMM] = bookings[i].starttime.split(":").map(Number);
+        const [endHH, endMM] = bookings[i].endtime.split(":").map(Number);
+        const weekday = getWeekdayFromDate(bookings[i].date);
+
+        let hexCode = "#000000";
+        for (let j = 0; j < bookingTypes.length; j++) {
+            if (bookingTypes[j].title === bookings[i].booking_type) {
+                hexCode = bookingTypes[j].hexCode;
+                break;
+            }
+        }
+
+        let y = (startHH - 6) * 2 + (startMM === 30 ? 1 : 0);
+        const oldY = y;
+        let baseCol = (bookings[i].courtCourtID === 1 || bookings[i].courtCourtID === "1") ? 0 : 1;
+        
         let hh = startHH;
         let mm = startMM;
-        let hexCode = "#000000";
-        for(let j = 0; j < bookingTypes.length; j++){
-          if(bookingTypes[j].title == bookings[i].booking_type){
-            hexCode = bookingTypes[j].hexCode;
-            break;
-          }
-        }
-        while(hh < endHH  || mm < endMM){
-            if(y % 2 != 0){
-              if(rgbToHex(tr[y].children[x-1].style.backgroundColor) != closureColor){
-                tr[y].children[x-1].style.backgroundColor = hexCode;
-                tr[y].children[x-1].dataset.tooltip = bookings[i].userUserID;
-                tr[y].children[x-1].classList.remove(...'border'.split(" "));
-                tr[y].children[x-1].classList.add(...'border-r border-l'.split(" "));
-              }
-            }else{
-              if(rgbToHex(tr[y].children[x].style.backgroundColor) != closureColor){
-                tr[y].children[x].style.backgroundColor = hexCode;
-                tr[y].children[x].dataset.tooltip = bookings[i].userUserID;
-                tr[y].children[x].classList.remove(...'border'.split(" "));
-                tr[y].children[x].classList.add(...'border-r border-l'.split(" "));
-              }
+        let currentY = y;
+
+        while (hh * 60 + mm < endHH * 60 + endMM) {
+            const row = tr[currentY];
+            if (!row) break;
+
+            let hasTimeCell = (currentY % 2 === 0);
+            let colIndexInRow = (weekday * 2) + baseCol + (hasTimeCell ? 1 : 0);
+
+            if (currentY !== oldY) {
+                if (row.cells[colIndexInRow]) {
+                    row.cells[colIndexInRow].style.display = 'none';
+                }
             }
-          hh = (mm == 30)? ++hh : hh;
-          mm = (mm == 30)? 00 : 30;
-          y++;
+
+            if (mm === 30) { hh++; mm = 0; } else { mm = 30; }
+            currentY++;
         }
-      }
+
+        const firstRow = tr[oldY];
+        let hasTimeCellStart = (oldY % 2 === 0);
+        let finalColIndex = (weekday * 2) + baseCol + (hasTimeCellStart ? 1 : 0);
+        
+        const firstCell = firstRow.cells[finalColIndex];
+        if (firstCell) {
+            firstCell.style.backgroundColor = hexCode;
+            firstCell.style.border = "1px solid #d1d5db";
+            firstCell.rowSpan = currentY - oldY;
+
+            if (bookings[i].booking_type == 'reservation' && showNames) {
+                firstCell.classList.add(...'break-words', 'truncate', 'text-xs');
+                let name = bookings[i].lastname.length <= 5 ? 
+                           bookings[i].lastname : 
+                           bookings[i].lastname.slice(0, 5) + ".";
+                firstCell.innerText = name + "\n " + bookings[i].firstname.slice(0, 1) + ".";
+            }
+        }
     }
+}
 
-  }
-
-  function fillDataDayView(d){
-    const tr = document.getElementById('dayTimeTableBody').children;
+function fillDataDayView(d) {
+    const rows = document.getElementById('dayTimeTableBody').children;
     const date = new Date(d);
-    let closureColor = '#ff0000';
     const bookingTypes = {{{json bookingTypes}}};
-    for(let i = 0; i < bookingTypes.length; i++){
-      if(bookingTypes[i].title == 'closed'){
-        closureColor = bookingTypes[i].hexCode;
-        break;
-      }
-    }
     const bookings = {{{json bookingsForTable}}};
+    const showNames = {{{json showNames}}};
 
-    for(let i = 0; i < bookings.length; i++){
+    for (let i = 0; i < bookings.length; i++) {
+        const bDate = new Date(bookings[i].date.split("T")[0]);
+        if (bDate.toDateString() !== date.toDateString()) continue;
 
-      if(new Date(bookings[i].date.split("T")[0]).toDateString() == date.toDateString()){
-        console.log(bookings[i]);
-        let x = (parseInt(bookings[i].courtCourtID) == 1)? 1 : 2;
-        let y = (parseInt(bookings[i].starttime.split(":")[0]) - 6) * 2;
-        y = (parseInt(bookings[i].starttime.split(":")[1]) == 30)? ++y : y;
-        let startHH = parseInt(bookings[i].starttime.split(":")[0]);
-        let startMM = parseInt(bookings[i].starttime.split(":")[1]);
-        let endHH = parseInt(bookings[i].endtime.split(":")[0]);
-        let endMM = parseInt(bookings[i].endtime.split(":")[1]);
+        const [startHH, startMM] = bookings[i].starttime.split(":").map(Number);
+        const [endHH, endMM] = bookings[i].endtime.split(":").map(Number);
+
+        let y = (startHH - 6) * 2 + (startMM === 30 ? 1 : 0);
+        const startY = y;
+        const courtIdx = (bookings[i].courtCourtID === 1 || bookings[i].courtCourtID === "1") ? 1 : 2;
+
+        let hexCode = "#000000";
+        for (let j = 0; j < bookingTypes.length; j++) {
+            if (bookingTypes[j].title === bookings[i].booking_type) {
+                hexCode = bookingTypes[j].hexCode;
+                break;
+            }
+        }
+
         let hh = startHH;
         let mm = startMM;
-        let hexCode = "#000000";
-        for(let j = 0; j < bookingTypes.length; j++){
-          if(bookingTypes[j].title == bookings[i].booking_type){
-            hexCode = bookingTypes[j].hexCode;
-            break;
-          }
-        }
-        while(hh < endHH  || mm < endMM){
-            if(y % 2 != 0){
-              if(rgbToHex(tr[y].children[x-1].style.backgroundColor) != closureColor){
-                tr[y].children[x-1].style.backgroundColor = hexCode;
-                tr[y].children[x-1].dataset.tooltip = bookings[i].userUserID;
-                tr[y].children[x-1].classList.remove(...'border'.split(" "));
-                tr[y].children[x-1].classList.add(...'border-r border-l'.split(" "));
-              }
-            }else{
-              if(rgbToHex(tr[y].children[x].style.backgroundColor) != closureColor){
-                tr[y].children[x].style.backgroundColor = hexCode;
-                tr[y].children[x].dataset.tooltip = bookings[i].userUserID;
-                tr[y].children[x].classList.remove(...'border'.split(" "));
-                tr[y].children[x].classList.add(...'border-r border-l'.split(" "));
-              }
-            }
-          hh = (mm == 30)? ++hh : hh;
-          mm = (mm == 30)? 00 : 30;
-          y++;
-        }
-      }
-    }
-  }
+        let currentY = y;
 
+        while (hh * 60 + mm < endHH * 60 + endMM) {
+            const row = rows[currentY];
+            if (currentY !== startY && row) {
+                let hasTimeCell = (currentY % 2 === 0);
+                let actualCol = hasTimeCell ? courtIdx : courtIdx - 1;
+                if (row.cells[actualCol]) {
+                    row.cells[actualCol].style.display = 'none';
+                }
+            }
+            if (mm === 30) { hh++; mm = 0; } else { mm = 30; }
+            currentY++;
+        }
+
+        const firstRow = rows[startY];
+        let hasTimeCellStart = (startY % 2 === 0);
+        let finalCol = hasTimeCellStart ? courtIdx : courtIdx - 1;
+
+        const firstCell = firstRow.cells[finalCol];
+        if (firstCell) {
+            firstCell.style.backgroundColor = hexCode;
+            firstCell.classList.add(...'border', 'border-gray-300');
+            firstCell.rowSpan = currentY - startY;
+
+            if (bookings[i].booking_type === 'reservation' && showNames) {
+                firstCell.classList.add(...'break-words', 'truncate', 'text-xs');
+                let name = bookings[i].lastname.length <= 5 ? 
+                           bookings[i].lastname : 
+                           bookings[i].lastname.slice(0, 5) + ".";
+                firstCell.innerText = name + "\n " + bookings[i].firstname.slice(0, 1) + ".";
+            }
+        }
+    }
+}
+
+function recreateDayView() {
+  const tbody = document.getElementById('dayTimeTableBody');
+
+  for (let stunde = 7; stunde <= 22; stunde++) {
+    const tr1 = document.createElement("tr");
+    const tr2 = document.createElement("tr");
+    tr1.classList.add('h-6');
+    tr2.classList.add('h-6');
+
+    let zeitCell = document.createElement("td");
+    zeitCell.className = "border-r border-l border-t border-gray-300 p-2 font-medium bg-gray-50";
+    zeitCell.textContent = `${String(stunde - 1).padStart(2, "0")}:00`;
+    zeitCell.rowSpan = 2;
+    tr1.appendChild(zeitCell);
+
+    // Initialisiere leere Zellen für Platz 1 und Platz 2
+    for (let i = 0; i < 2; i++) {
+      let td1 = document.createElement("td");
+      td1.className = "border border-gray-300 p-2 h-6";
+      tr1.appendChild(td1);
+
+      let td2 = document.createElement("td");
+      td2.className = "border border-gray-300 p-2 h-6";
+      tr2.appendChild(td2);
+    }
+
+    tbody.appendChild(tr1);
+    tbody.appendChild(tr2);
+  }
+}
 
   function clearTbody(){
-    const tr = document.getElementById('timeTableBody').children;
-    const MAX_Y = 31;
-    for(let y = 0; y <= MAX_Y; y++){
-      for(let x = 1; x < tr[y].children.length; x++){
-        if(x % 2 != 0){
-          if(tr[y].children[x-1].classList.contains('border-l')){
-            tr[y].children[x-1].classList.remove('border-l');
-            tr[y].children[x-1].classList.remove('border-r');
-            tr[y].children[x-1].classList.add('border');
-          }
-          tr[y].children[x-1].style.backgroundColor = "";
-        }
-        if(tr[y].children[x].classList.contains('border-l')){
-          tr[y].children[x].classList.remove('border-l');
-          tr[y].children[x].classList.remove('border-r');
-          tr[y].children[x].classList.add('border');
-        }
-        tr[y].children[x].style.backgroundColor = "";
-      }
+    const tr = document.getElementById('timeTableBody');
+    while(tr.firstChild){
+      tr.removeChild(tr.firstChild);
     }
   }
 
   function clearTbodyDayView(){
-    const tr = document.getElementById('dayTimeTableBody').children;
-    console.log(tr);
-    for(let y = 0; y < tr.length; y++){
-      for(let x = 1; x < tr[y].children.length; x++){
-        if(x % 2 != 0){
-          if(tr[y].children[x-1].classList.contains('border-l')){
-            tr[y].children[x-1].classList.remove('border-l');
-            tr[y].children[x-1].classList.remove('border-r');
-            tr[y].children[x-1].classList.add('border');
-          }
-          tr[y].children[x-1].style.backgroundColor = "";
-        }
-        if(tr[y].children[x].classList.contains('border-l')){
-          tr[y].children[x].classList.remove('border-l');
-          tr[y].children[x].classList.remove('border-r');
-          tr[y].children[x].classList.add('border');
-        }
-        tr[y].children[x].style.backgroundColor = "";
-      }
+    const tbody = document.getElementById('dayTimeTableBody');
+    while(tbody.firstChild){
+      tbody.removeChild(tbody.firstChild);
     }
   }
 
@@ -624,4 +690,16 @@
         .join('');
   }
 
+  function setColors(){
+    const booking_types = {{{json bookingTypes}}};
+    for(let i = 0; i < booking_types.length; i++){
+      if(booking_types[i].title == 'reservation'){
+        document.getElementById('colorReservation').style.backgroundColor = booking_types[i].hexCode;
+      }else if(booking_types[i].title == 'closed'){
+        document.getElementById('colorClosure').style.backgroundColor = booking_types[i].hexCode;
+      }else if(booking_types[i].title == 'championship'){
+        document.getElementById('colorChampionship').style.backgroundColor = booking_types[i].hexCode;
+      }
+    }
+  }
 </script>

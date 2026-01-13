@@ -1,4 +1,4 @@
-const {getUserByEmail} = require("../models/auth.model");
+const {getUserByUsername} = require("../models/auth.model");
 const bcrypt = require('bcrypt');
 const navLinks = [
     {
@@ -22,9 +22,9 @@ showLogin = (req,res) => {
 }
 
 handleLogin = async(req,res) => {
-    const {email, password} = req.body;
-    const user = await getUserByEmail(email);
-    if(user != undefined && await bcrypt.compare(password, user.password) && email == user.email){
+    const {username, password} = req.body;
+    const user = await getUserByUsername(username);
+    if(user != undefined && await bcrypt.compare(password, user.password) && username == user.username){
         req.session.user = user;
         res.redirect("/user");
     }else{

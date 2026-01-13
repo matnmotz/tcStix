@@ -14,7 +14,7 @@ const navLinks = [
 showLandingPage = async(req,res) => {
     const bookingTypes = await getBookingTypes();
     const bookingsForTable = await getAllBookingsBetween(getWeekRange().monday, getWeekRange().sunday);
-    res.render("index", {navLinks,showTitle: true, bookingTypes, bookingsForTable});
+    res.render("index", {navLinks,showTitle: true, bookingTypes, bookingsForTable, showNames: false});
 }
 
 //private function
