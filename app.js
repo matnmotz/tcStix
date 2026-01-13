@@ -87,6 +87,12 @@ app.use("/legal",legalRouter);
 //Landing-page
 app.get("/",landingController.showLandingPage);
 
+const {appendToLogs} = require("./models/error.model");
+app.get("/test",(req,res) =>{
+  appendToLogs('TEST');
+  res.end();
+});
+
 
 app.listen(port, () => {
   console.log(`✅ Server läuft auf http://0.0.0.0:${port}`);

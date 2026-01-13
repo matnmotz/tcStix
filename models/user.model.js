@@ -1,9 +1,5 @@
 const mysql = require('../config/db_config');
 
-function getBookings(){
-
-}
-
 async function getUsers(){
     try{
         const sql = "SELECT * FROM user ORDER BY lastname ASC";
@@ -26,7 +22,7 @@ async function getUsers(){
         }
         return result;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -36,7 +32,7 @@ async function getUsersUserIdAndName(){
         const [rows] = await mysql.pool.query(sql);
         return rows;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -58,7 +54,7 @@ async function getUser(userID){
         }
         return result;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -68,7 +64,7 @@ async function getUUID(){
         const [rows] = await mysql.pool.query(sql);
         return rows[0].uuid;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -78,7 +74,7 @@ async function getRoleIdByTitle(title){
         const [rows] = await mysql.pool.query(sql, [title]);
         return rows[0].roleID;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -88,7 +84,7 @@ async function getRoleTitleByRoleId(id){
         const [rows] = await mysql.pool.query(sql, [id]);
         return rows[0].title;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -99,7 +95,7 @@ async function addUser(user){
         const sql = "INSERT INTO user (userID, firstname, lastname, username, password, street, houseNumber, zip, city, roleRoleID, gender) VALUE (?,?,?,?,?,?,?,?,?,?,?)";
         await mysql.pool.query(sql, [`${uuid}`, user.firstname, user.lastname, user.username, user.password, user.street, user.houseNumber, user.zip, user.city, roleID, user.gender]);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -109,7 +105,7 @@ async function updateUser(user){
         const sql = "UPDATE user SET firstname = ?, lastname = ?, username = ?, street = ?, houseNumber = ?, zip = ?, city = ?, roleRoleID = ?, gender = ? WHERE userID = ?";
         await mysql.pool.query(sql, [user.firstname, user.lastname, user.username, user.street, user.houseNumber, user.zip, user.city, roleID, user.gender, user.userID]);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -118,7 +114,7 @@ async function deleteUser(userID){
         const sql = "DELETE FROM user WHERE userID = ?";
         await mysql.pool.query(sql, [userID]);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 
 }
@@ -128,7 +124,7 @@ async function updateBookingType(data){
         const sql = "UPDATE booking_type set hexCode = ? WHERE title = ?";
         await mysql.pool.query(sql, [data.hexCode, data.title]);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -138,7 +134,7 @@ async function getBookingTypes(){
         const [rows] = await mysql.pool.query(sql);
         return rows;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -152,7 +148,7 @@ async function addActivity(data){
             await mysql.pool.query(sql, [data.users[i], uuid]);
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -194,7 +190,7 @@ async function getActivitys(){
         }
         return resultArr;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -221,7 +217,7 @@ async function getActivity(activityID){
         }
         return arr;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -236,7 +232,7 @@ async function updateActivity(data){
             await mysql.pool.query(sql, [data.users[i], data.activityID]);
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -246,7 +242,7 @@ async function getCourts(){
         const [rows] = await mysql.pool.query(sql);
         return rows
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -291,7 +287,7 @@ async function checkFreeCourt(data){
             return false;
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -343,7 +339,7 @@ async function checkUserAllowedBooking(data, roleTitle, userID){
         }
         return true;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -365,7 +361,7 @@ async function addAbo(data){
             date.setDate(date.getDate() + 7);
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -381,7 +377,7 @@ async function getAbos(){
         }
         return rows;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -396,7 +392,7 @@ async function deleteAbo(noteID){
         sql = "DELETE FROM booking WHERE note = ? AND booking_type = 'reservation'";
         await mysql.pool.query(sql, [noteID]);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -411,7 +407,7 @@ async function addBooking(data, userID){
         sql = "INSERT INTO booking_user (bookingBookingID, userUserID, activity) VALUES (?,?,?)";
         await mysql.pool.query(sql, [uuid, userID, 'active']);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -448,7 +444,7 @@ async function getBookings(userID){
         }
         return result;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -459,7 +455,7 @@ async function deleteBooking(bookingID){
         sql = "DELETE FROM booking_user WHERE bookingBookingID = ?";
         await mysql.pool.query(sql, [bookingID]);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -473,7 +469,7 @@ async function allowedToDeleteBooking(userID, bookingID){
             return false;
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -499,7 +495,7 @@ async function addChampionship(opponent,date,from,to, userID){
             await mysql.pool.query(sql_user, [bookingIDs[i-1], userID]);
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -521,7 +517,7 @@ async function getChampionships(){
         }
         return rows;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -536,7 +532,7 @@ async function deleteChampionship(date){
             await mysql.pool.query(sql, [rows[i].bookingID]);
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -566,7 +562,7 @@ async function addClosure(from,to,courtParam,userID){
             }
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -585,7 +581,7 @@ async function getActiveClosure(){
         }
         return [];
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -596,7 +592,7 @@ async function updateClosure(noteID, enddatetime, userID){
         sql = "UPDATE booking SET endtime = ?, timestamp = ? WHERE date = ? AND note = ? AND booking_type = ?";
         await mysql.pool.query(sql, [enddatetime.split("T")[1], await getSQLTimestamp(), enddatetime.split("T")[0], noteID, 'closed']);
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -606,7 +602,7 @@ async function getAllBookingsBetween(startdate, enddate){
         const [rows] = await mysql.pool.query(sql, [startdate, enddate]); 
         return rows;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 //private functions

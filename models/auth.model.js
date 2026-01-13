@@ -1,4 +1,5 @@
 const mysql = require('../config/db_config');
+const {appendToLogs} = require('./error.model');
 
 async function getUserByUsername(username){
     try{
@@ -23,7 +24,7 @@ async function getUserByUsername(username){
             return undefined;
         }
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -33,7 +34,7 @@ async function getRoleTitleByRoleId(roleID){
         const [rows] = await mysql.pool.query(sql, [roleID]);
         return rows[0].title;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 

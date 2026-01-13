@@ -1,5 +1,6 @@
 const ExcelJS = require('exceljs');
 const mysql = require('../config/db_config');
+const {appendToLogs} = require('./error.model');
 
 //activitys
 async function getColsForActivityTable(year){
@@ -16,7 +17,7 @@ async function getColsForActivityTable(year){
         result.push('SUMME in EURO');
         return result;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -45,7 +46,7 @@ async function getUserObject(year){
         }
         return result;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -82,7 +83,7 @@ async function getDataForActivityTable(year, hourlyFee){
         return result;
 
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -139,7 +140,7 @@ async function getMembers(){
         const [rows] = await mysql.pool.query(sql);
         return rows;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
@@ -155,7 +156,7 @@ async function getSumOfWorkedHours(year){
         }
         return members;
     }catch(err){
-        console.log(err);
+        appendToLogs(err);
     }
 }
 
